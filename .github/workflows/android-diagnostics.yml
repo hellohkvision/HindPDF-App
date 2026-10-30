@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-audit --no-fund
-      - name: Inspect module publications
+      - name: Inspect font package\n        run: |\n          node -e "const fs=require('fs'); const path=require('path'); const p=require.resolve('expo-font/package.json'); console.log('FONT_VERSION:',require(p).version); console.log('FONT_CONFIG:',fs.readFileSync(path.join(path.dirname(p),'expo-module.config.json'),'utf8'));"\n          npm ls expo-font\n      - name: Inspect module publications
         run: |
           npx expo-modules-autolinking resolve --platform android --json > /tmp/hind-modules.json
           node -e "const d=require('/tmp/hind-modules.json');for(const [i,m] of d.modules.entries()){console.log(i, m.packageName, JSON.stringify(m.projects?.map(p=>({name:p.name,publication:p.publication}))));}"
