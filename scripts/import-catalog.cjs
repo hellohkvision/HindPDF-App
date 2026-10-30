@@ -1,0 +1,14 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const source = fs.readFileSync('../HindPDF-Frontend/js/05-app-core.js', 'utf8');
+const icons = new Proxy({}, {get: () => ''});
+const catalog = vm.runInNewContext(source.match(/const toolsCatalog = (\[[\s\S]*?\n    \]);/)[1], {icons});
+const multi = new Set(['merge','jpg-to-pdf','png-to-pdf','image-to-pdf','photo-signature-prep','scan-to-pdf']);
+const server = new Set(['compress','word-to-pdf','pdf-to-word','excel-to-pdf','pdf-to-excel','ppt-to-pdf','ocr']);
+fs.writeFileSync('src/data/tools.json', JSON.stringify(catalog.map(({svg,...t}) => ({...t,multiple:multi.has(t.id),location:server.has(t.id)?'server':'device',available:!['pdf-to-ppt','redact'].includes(t.id)})),null,2)+'\n');
+const start = source.indexOf('const GOVT_PRESET_CONFIG =');
+const end = source.indexOf('const icons =', start);
+const section = source.slice(start,end);
+const presets = vm.runInNewContext(section+'\n;GOVT_PRESET_CONFIG;', {window:{}});
+fs.writeFileSync('src/data/presets.json',JSON.stringify(Object.values(presets),null,2)+'\n');
+console.log(`Imported ${catalog.length} website tools and ${Object.keys(presets).length} government presets.`);

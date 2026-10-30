@@ -1,0 +1,176 @@
+[
+  {
+    "id": "ssc",
+    "name": "SSC — exam-specific guidance",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live photo captured on the SSC portal"
+    },
+    "disclaimer": "SSC captures the photo live. A cropped or compressed existing photo does not replace live capture. Select the specific exam notice for signature requirements."
+  },
+  {
+    "id": "rrb",
+    "name": "RRB — select a specific CEN",
+    "sourceUrl": "https://www.rrbcdg.gov.in/",
+    "disclaimer": "Reviewed 28 October 2026. No shared upload sizes are verified for NTPC, Group D and ALP. Select the verified Group D notice or ALP guidance below; otherwise use the current CEN and portal."
+  },
+  {
+    "id": "upsc",
+    "name": "UPSC — current common application portal",
+    "sourceUrl": "https://upsconline.nic.in/caf/assets/PDF/instruction-photo-signature-upload-upsc.pdf",
+    "disclaimer": "Reviewed 28 October 2026. Uploaded photo: JPG, 20–200 KB, at least 75% face coverage, plain white background; no fixed photo pixel size is specified. Live capture is also mandatory on the official portal. Signature: exactly three signatures vertically on one white sheet in black ink, one JPG, 20–100 KB; dimensions stated as 350–500 pixels without explicit axis labels. Confirm width and height in the current portal; this tool does not assume both axes. Follow any exam-specific update. The old OTR preset is retired.",
+    "photo": {
+      "minKB": 20,
+      "maxKB": 200,
+      "format": "image/jpeg",
+      "label": "Uploaded JPG photo, 20–200 KB; live capture also required"
+    },
+    "signature": {
+      "minKB": 20,
+      "maxKB": 100,
+      "format": "image/jpeg",
+      "label": "Triple signature JPG, 20–100 KB; 350–500 px"
+    }
+  },
+  {
+    "id": "odisha_state",
+    "name": "Odisha — advertisement-specific settings",
+    "sourceUrl": "https://www.osssc.gov.in/",
+    "disclaimer": "Reviewed 28 October 2026. No common preset is verified across OSSC, OSSSC, OPSC and OSSTET. A historical OSSSC teacher advertisement (2024 deadline) allows a 20–100 KB photo and 20–50 KB signature, JPG/JPEG/PNG; these are not current or universal Odisha limits. Current OSSC, OPSC and OSSTET numeric criteria remain unverified. Enter values from your exact advertisement."
+  },
+  {
+    "id": "banking",
+    "name": "Banking — recruitment-specific settings",
+    "sourceUrl": "https://www.ibps.in/",
+    "disclaimer": "Reviewed 28 October 2026. No universal preset is verified for IBPS, SBI and RBI. Current IBPS PDF retrieval failed. RBI Assistant indexed guidance partially confirms signature 10–20 KB, thumb 20–50 KB and live capture, but full instructions were blocked. Select the separately sourced SBI PO 2025 reference only for that notice."
+  },
+  {
+    "id": "ssc_cgl",
+    "name": "SSC CGL — 2026 notice",
+    "sourceUrl": "https://ssc.gov.in/api/attachment/uploads/masterData/NoticeBoards/Notice_of_adv_cgl_2025.pdf",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on SSC portal"
+    },
+    "signature": {
+      "minKB": 10,
+      "maxKB": 20,
+      "format": "image/jpeg",
+      "label": "JPG/JPEG, 10–20 KB; about 6 × 2 cm in the main clause. Set dimensions from your current portal."
+    },
+    "disclaimer": "Checked 28 October 2026 against the 2026 notice, clause 9.6. Photo: live capture. Signature: JPG/JPEG, 10–20 KB, about 6 × 2 cm in the main clause. The annexure also mentions 4 × 2 cm; follow the current application portal. No mandatory pixel size is assumed."
+  },
+  {
+    "id": "ssc_chsl",
+    "name": "SSC CHSL — 2025 notice",
+    "sourceUrl": "https://ssc.gov.in/api/attachment/uploads/masterData/NoticeBoards/Notice_of_adv_chsl_2025.pdf",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on SSC portal"
+    },
+    "signature": {
+      "minKB": 10,
+      "maxKB": 20,
+      "format": "image/jpeg",
+      "label": "JPG/JPEG, 10–20 KB; about 6 × 2 cm in the main clause. Set dimensions from your current portal."
+    },
+    "disclaimer": "Checked 28 October 2026 against the 2025 notice, clause 9.6. Photo: live capture. Signature: JPG/JPEG, 10–20 KB, about 6 × 2 cm in the main clause. The annexure also mentions 4 × 2 cm; follow the current application portal. The 2026 cycle has not been verified. No mandatory pixel size is assumed."
+  },
+  {
+    "id": "ssc_mts",
+    "name": "SSC MTS — 2025 notice",
+    "sourceUrl": "https://ssc.gov.in/api/attachment/uploads/masterData/NoticeBoards/Notice_of_adv_mts_2025.pdf",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on SSC portal"
+    },
+    "signature": {
+      "minKB": 10,
+      "maxKB": 20,
+      "format": "image/jpeg",
+      "label": "JPG/JPEG, 10–20 KB; about 6 × 2 cm in the main clause. Set dimensions from your current portal."
+    },
+    "disclaimer": "Checked 28 October 2026 against the 2025 notice, clause 10.6. Photo: live capture. Signature: JPG/JPEG, 10–20 KB, about 6 × 2 cm in the main clause. The 2026 cycle has not been verified. No mandatory pixel size is assumed."
+  },
+  {
+    "id": "ssc_gd",
+    "name": "SSC GD — 2026 notice",
+    "sourceUrl": "https://ssc.gov.in/api/attachment/uploads/masterData/NoticeBoards/Notice_of_CTGD_2026.pdf",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on SSC portal"
+    },
+    "disclaimer": "Live photo capture confirmed in indexed official notice text. Full PDF retrieval failed; signature criteria remain unverified. Set signature dimensions and size from the current SSC portal."
+  },
+  {
+    "id": "rrb_groupd",
+    "name": "RRB Group D — CEN 09/2025",
+    "sourceUrl": "https://www.rrbcdg.gov.in/uploads/2025/09-LVL1/092025-CEN.pdf",
+    "disclaimer": "Reviewed 28 October 2026. Verified against indexed official notice text; full PDF retrieval timed out. Photo is captured live in the portal. Signature: JPG/JPEG, 30–49 KB, minimum 140 × 60 px, scan at least 100 DPI; black ink on white paper, running handwriting. Portal scan box: 35 × 20 mm. SC/ST free-travel certificate: PDF under 400 KB. Do not apply this to other CENs.",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on RRB portal"
+    },
+    "signature": {
+      "minKB": 30,
+      "maxKB": 49,
+      "minDpi": 100,
+      "minWidth": 140,
+      "minHeight": 60,
+      "format": "image/jpeg",
+      "label": "JPG/JPEG, 30–49 KB; minimum 140 × 60 px; scan ≥100 DPI"
+    },
+    "certificatePdf": {
+      "maxKB": 400,
+      "label": "SC/ST travel certificate strictly under 400 KB"
+    }
+  },
+  {
+    "id": "rrb_alp",
+    "name": "RRB ALP — CEN 01/2026, partial verification",
+    "sourceUrl": "https://www.rrbahmedabad.gov.in/wp-content/uploads/2026/05/detail-cen-01-2026-eng-.pdf",
+    "disclaimer": "Reviewed 28 October 2026. Indexed official text confirms live-photo guidance and signature size 30–49 KB. Full PDF retrieval failed; remaining dimensions and format details have not been verified. No automatic dimensions or size preset is applied.",
+    "photo": {
+      "liveCapture": true,
+      "label": "Live capture on RRB portal"
+    }
+  },
+  {
+    "id": "sbi_po_2025",
+    "name": "SBI PO — 2025 notice reference only",
+    "sourceUrl": "https://sbi.bank.in/documents/77530/52947104/1_Detailed_Adv.2026_23.06.2026.pdf/54ca0942-3de1-afc4-45e8-f679fc552e7b?t=1750741324277",
+    "disclaimer": "Reviewed 28 October 2026. Source content is PO 2025, CRPD/PO/2025-26/04, despite the filename. Not verified for 2026 or other SBI posts. JPG/JPEG photo 20–50 KB; preferred 200 × 230 px. Live capture also required. Signature 10–20 KB, preferred 140 × 60 px. Thumb 20–50 KB, preferred 240 × 240 px; declaration 50–100 KB, preferred 800 × 400 px, at 200 DPI. Signature and declaration in black ink; no capitals. Preferred pixels are editable defaults.",
+    "photo": {
+      "minKB": 20,
+      "maxKB": 50,
+      "width": 200,
+      "height": 230,
+      "format": "image/jpeg",
+      "label": "20–50 KB; preferred 200 × 230 px; live capture also required"
+    },
+    "signature": {
+      "minKB": 10,
+      "maxKB": 20,
+      "width": 140,
+      "height": 60,
+      "format": "image/jpeg",
+      "label": "10–20 KB; preferred 140 × 60 px"
+    },
+    "thumb": {
+      "minKB": 20,
+      "maxKB": 50,
+      "width": 240,
+      "height": 240,
+      "format": "image/jpeg",
+      "label": "20–50 KB; preferred 240 × 240 px"
+    },
+    "declaration": {
+      "minKB": 50,
+      "maxKB": 100,
+      "width": 800,
+      "height": 400,
+      "format": "image/jpeg",
+      "label": "50–100 KB; preferred 800 × 400 px"
+    }
+  }
+]

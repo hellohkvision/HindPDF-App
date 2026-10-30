@@ -1,0 +1,791 @@
+[
+  {
+    "id": "merge",
+    "slug": "merge-pdf",
+    "catKey": "core",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Merge PDF",
+    "tier": "free",
+    "desc": "Combine multiple PDFs into one document in your exact order.",
+    "color": "#e11d48",
+    "prefix": "Merged_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "split",
+    "slug": "split-pdf",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Split PDF",
+    "tier": "free",
+    "desc": "Split a PDF into separate pages or extract selected ranges.",
+    "color": "#f59e0b",
+    "prefix": "Split_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "compress",
+    "slug": "compress-pdf",
+    "catKey": "core",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Compress PDF",
+    "tier": "freemium",
+    "desc": "Reduce PDF size with 100 KB, 200 KB, and 500 KB presets.",
+    "color": "#10b981",
+    "prefix": "Compressed_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "pdf-to-jpg",
+    "slug": "pdf-to-jpg",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "PDF to JPG",
+    "tier": "free",
+    "desc": "Extract each page of your PDF into high-quality JPG images.",
+    "color": "#ec4899",
+    "prefix": "Images_",
+    "ext": ".zip",
+    "mime": "application/zip",
+    "cat": "image_zip",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "jpg-to-pdf",
+    "slug": "jpg-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "JPG to PDF",
+    "tier": "free",
+    "desc": "Convert JPG, JPEG, and PNG images into one PDF.",
+    "color": "#9333ea",
+    "prefix": "Converted_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "pdf-to-png",
+    "slug": "pdf-to-png",
+    "catKey": "core",
+    "persona": [
+      "business"
+    ],
+    "name": "PDF to PNG",
+    "tier": "free",
+    "desc": "Convert PDF pages into clear PNG images.",
+    "color": "#06b6d4",
+    "prefix": "Images_PNG_",
+    "ext": ".zip",
+    "mime": "application/zip",
+    "cat": "image_zip",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "png-to-pdf",
+    "slug": "png-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "PNG to PDF",
+    "tier": "free",
+    "desc": "Combine PNG, JPG, and JPEG images into one PDF.",
+    "color": "#3b82f6",
+    "prefix": "Images_to_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "image-to-pdf",
+    "slug": "image-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Image to PDF",
+    "tier": "free",
+    "desc": "Combine supported JPG, JPEG, and PNG images into one PDF.",
+    "color": "#7c3aed",
+    "prefix": "Images_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "photo-resizer",
+    "slug": "photo-resizer",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Photo Resizer",
+    "tier": "free",
+    "desc": "Resize and optimize a photo for an application upload.",
+    "color": "#ea580c",
+    "prefix": "Prepared_photo_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "photo-compressor",
+    "slug": "photo-compressor",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Compress Photo",
+    "tier": "free",
+    "desc": "Reduce an image file size while keeping it clear.",
+    "color": "#0f3d64",
+    "prefix": "Compressed_photo_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "signature-resizer",
+    "slug": "signature-resizer",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Signature Resizer",
+    "tier": "free",
+    "desc": "Resize and optimize a handwritten signature image.",
+    "color": "#0f172a",
+    "prefix": "Prepared_signature_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "thumb-impression-resizer",
+    "slug": "thumb-impression-resizer",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Thumb Impression Resizer",
+    "tier": "free",
+    "desc": "Prepare a thumb impression image for an application upload.",
+    "color": "#0f3d64",
+    "prefix": "Prepared_thumb_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "declaration-optimizer",
+    "slug": "declaration-optimizer",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Declaration Optimizer",
+    "tier": "free",
+    "desc": "Optimize a handwritten declaration image for upload.",
+    "color": "#0f3d64",
+    "prefix": "Prepared_declaration_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "photo-signature-prep",
+    "slug": "photo-signature-prep",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Photo + Signature Prep",
+    "tier": "free",
+    "desc": "Prepare photo and signature files together for an application.",
+    "color": "#e11d48",
+    "prefix": "Application_assets_",
+    "ext": ".zip",
+    "mime": "application/zip",
+    "cat": "image_zip",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "pdf-to-image",
+    "slug": "pdf-to-image",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "PDF to Image",
+    "tier": "free",
+    "desc": "Convert PDF pages to JPG or PNG images in a ZIP package.",
+    "color": "#0ea5e9",
+    "prefix": "Images_",
+    "ext": ".zip",
+    "mime": "application/zip",
+    "cat": "image_zip",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "word-to-pdf",
+    "slug": "word-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Word to PDF",
+    "tier": "free",
+    "desc": "Convert DOCX word documents directly to PDF.",
+    "color": "#2563eb",
+    "prefix": "Word_Converted_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".docx,.doc",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "pdf-to-word",
+    "slug": "pdf-to-word",
+    "catKey": "core",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "PDF to Word",
+    "tier": "freemium",
+    "desc": "Convert text-based PDF documents to editable Word documents.",
+    "color": "#1d4ed8",
+    "prefix": "Editable_",
+    "ext": ".docx",
+    "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "cat": "document",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "excel-to-pdf",
+    "slug": "excel-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "business"
+    ],
+    "name": "Excel to PDF",
+    "tier": "free",
+    "desc": "Convert Excel spreadsheets (.xls, .xlsx) directly to PDF.",
+    "color": "#107c41",
+    "prefix": "Spreadsheet_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".xls,.xlsx",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "pdf-to-excel",
+    "slug": "pdf-to-excel",
+    "catKey": "core",
+    "persona": [
+      "business"
+    ],
+    "name": "PDF to Excel",
+    "tier": "freemium",
+    "desc": "Extract structured PDF tables to CSV/Excel spreadsheets.",
+    "color": "#059669",
+    "prefix": "Extracted_Sheet_",
+    "ext": ".xlsx",
+    "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "cat": "document",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "ppt-to-pdf",
+    "slug": "ppt-to-pdf",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "PowerPoint to PDF",
+    "tier": "free",
+    "desc": "Convert PPT presentation slides into easy-to-share PDF format.",
+    "color": "#ea580c",
+    "prefix": "Slides_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pptx,.ppt",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "pdf-to-ppt",
+    "slug": "pdf-to-ppt",
+    "catKey": "core",
+    "persona": [
+      "business"
+    ],
+    "name": "PDF to PowerPoint",
+    "tier": "freemium",
+    "desc": "Convert PDF pages into presentation slides.",
+    "color": "#c2410c",
+    "prefix": "Presentation_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": false
+  },
+  {
+    "id": "rotate",
+    "slug": "rotate-pdf",
+    "catKey": "organize",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Rotate PDF",
+    "tier": "free",
+    "desc": "Rotate pages clockwise with interactive visual canvas preview.",
+    "color": "#f97316",
+    "prefix": "Rotated_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "delete-pages",
+    "slug": "delete-pdf-pages",
+    "catKey": "organize",
+    "persona": [
+      "students"
+    ],
+    "name": "Delete PDF Pages",
+    "tier": "free",
+    "desc": "Visually select and remove unwanted PDF sheets.",
+    "color": "#ef4444",
+    "prefix": "Trimmed_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "extract-pages",
+    "slug": "extract-pdf-pages",
+    "catKey": "organize",
+    "persona": [
+      "students"
+    ],
+    "name": "Extract PDF Pages",
+    "tier": "free",
+    "desc": "Extract selected page ranges into a clean PDF.",
+    "color": "#0d9488",
+    "prefix": "Extracted_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "reorder-pages",
+    "slug": "reorder-pdf-pages",
+    "catKey": "organize",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Reorder PDF Pages",
+    "tier": "free",
+    "desc": "Rearrange the sequence of pages in your PDF.",
+    "color": "#f59e0b",
+    "prefix": "Reordered_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "page-numbers",
+    "slug": "page-numbers-pdf",
+    "catKey": "organize",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Add Page Numbers",
+    "tier": "free",
+    "desc": "Add page numbers with your choice of position, style and page range.",
+    "color": "#8b5cf6",
+    "prefix": "Numbered_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "crop-pdf",
+    "slug": "crop-pdf",
+    "catKey": "organize",
+    "persona": [
+      "business"
+    ],
+    "name": "Crop PDF",
+    "tier": "free",
+    "desc": "Trim document margins and remove unnecessary borders.",
+    "color": "#64748b",
+    "prefix": "Cropped_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "edit-pdf",
+    "slug": "edit-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Edit PDF",
+    "tier": "freemium",
+    "desc": "Add notes, annotations, and marks to pages.",
+    "color": "#3b82f6",
+    "prefix": "Edited_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "add-text",
+    "slug": "add-text-to-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Add Text to PDF",
+    "tier": "free",
+    "desc": "Overlay custom typography and text blocks onto pages.",
+    "color": "#6366f1",
+    "prefix": "Updated_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "add-watermark",
+    "slug": "watermark-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Watermark PDF",
+    "tier": "freemium",
+    "desc": "Stamp custom text watermark protection on documents.",
+    "color": "#7c3aed",
+    "prefix": "Watermarked_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "protect-password",
+    "slug": "protect-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Protect PDF",
+    "tier": "pro",
+    "desc": "Create a password-protected PDF directly in your browser.",
+    "color": "#4f46e5",
+    "prefix": "Secured_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "unlock",
+    "slug": "unlock-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Unlock PDF",
+    "tier": "free",
+    "desc": "Remove encryption and security restrictions.",
+    "color": "#d97706",
+    "prefix": "Unlocked_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "sign",
+    "slug": "sign-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Sign PDF",
+    "tier": "freemium",
+    "desc": "Draw, type or upload a signature and place it on your PDF.",
+    "color": "#0f172a",
+    "prefix": "Signed_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "redact",
+    "slug": "redact-pdf",
+    "catKey": "edit",
+    "persona": [
+      "business"
+    ],
+    "name": "Redact PDF",
+    "tier": "pro",
+    "desc": "Secure redaction is not available yet.",
+    "color": "#1f2937",
+    "prefix": "Redacted_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": false
+  },
+  {
+    "id": "scan-to-pdf",
+    "slug": "scan-to-pdf",
+    "catKey": "scan",
+    "persona": [
+      "students"
+    ],
+    "name": "Scan to PDF",
+    "tier": "free",
+    "desc": "Capture paper documents via camera into clean PDF.",
+    "color": "#10b981",
+    "prefix": "Scanned_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": "image/*,.pdf",
+    "multiple": true,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "ocr",
+    "slug": "ocr-pdf",
+    "catKey": "scan",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "OCR PDF",
+    "tier": "pro",
+    "desc": "Make scanned PDFs searchable and selectable with OCR.",
+    "color": "#6366f1",
+    "prefix": "Searchable_OCR_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "server",
+    "available": true
+  },
+  {
+    "id": "pdf-reader",
+    "slug": "pdf-viewer",
+    "catKey": "scan",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "PDF Viewer",
+    "tier": "free",
+    "desc": "Fast, private in-browser document inspection.",
+    "color": "#0ea5e9",
+    "prefix": "Inspected_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "repair-pdf",
+    "slug": "repair-pdf",
+    "catKey": "scan",
+    "persona": [
+      "business"
+    ],
+    "name": "Repair PDF",
+    "tier": "free",
+    "desc": "Recover damaged, unreadable, and corrupted PDF files.",
+    "color": "#f43f5e",
+    "prefix": "Repaired_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".pdf",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  },
+  {
+    "id": "html-to-pdf",
+    "slug": "html-to-pdf",
+    "catKey": "scan",
+    "persona": [
+      "business"
+    ],
+    "name": "HTML to PDF",
+    "tier": "free",
+    "desc": "Convert HTML web documents and code snippets to PDF.",
+    "color": "#84cc16",
+    "prefix": "Web_Document_",
+    "ext": ".pdf",
+    "mime": "application/pdf",
+    "cat": "pdf",
+    "accept": ".html,.htm,text/html",
+    "multiple": false,
+    "location": "device",
+    "available": true
+  }
+]
