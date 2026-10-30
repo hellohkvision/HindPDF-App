@@ -18,3 +18,5 @@ jobs:
       - run: npm run engine
       - run: npm run typecheck
       - run: npm test
+      - run: npx expo export --platform android --output-dir /tmp/hindpdf-android
+      - run: npx expo export --platform ios --output-dir /tmp/hindpdf-ios
