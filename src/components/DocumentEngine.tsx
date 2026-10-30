@@ -15,7 +15,8 @@ export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,r
  useImperativeHandle(ref,()=>({run:async(tool,files,options,onProgress)=>{
   if(!ready)throw Error('Document engine is starting. Please try again in a moment.');
   if(pending.current)throw Error('Another document is being processed.');
-  if(files.reduce((n,f)=>n+f.size,0)>35*1024*1024)throw Error('For device processing, choose files totalling less than 35 MB.');
+  let total=0;for(const file of files){const info=await FileSystem.getInfoAsync(file.uri);if(!info.exists)throw Error('Please choose the file again.');total+=info.size||file.size;}
+  if(total>35*1024*1024)throw Error('For device processing, choose files totalling less than 35 MB.');
   const encoded: (InputFile & {base64: string})[]=[];for(const file of files)encoded.push({...file,base64:await FileSystem.readAsStringAsync(file.uri,{encoding:FileSystem.EncodingType.Base64})});
   const signature=options.signature?{...options.signature,base64:await FileSystem.readAsStringAsync(options.signature.uri,{encoding:FileSystem.EncodingType.Base64})}:undefined;
   const id=Crypto.randomUUID();
