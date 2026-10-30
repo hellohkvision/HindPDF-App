@@ -1,28 +1,34 @@
-# HindPDF mobile — work in progress
+# HindPDF mobile
 
-React Native / Expo development project for Android and iOS, using the existing HindPDF API and the site's tool catalog. This is **not yet a release build**. Dependencies have not been installed in the current environment, and no Android or iOS build or device test has been performed.
+React Native / Expo Android and iOS app using the existing HindPDF backend. This project is under development; the checks below do not replace testing on a phone.
 
-## Setup
+## Open in Android Studio
 
-With Node.js installed and npm registry access:
+Install Node.js 20 or newer, Java 17, Android Studio and its Android SDK. Clone this repository and run these commands in a terminal from its root:
 
 ```sh
 npm install
-npm run engine
-npm run typecheck
-npm test
-npx expo run:android
-# On a Mac with Xcode and CocoaPods:
-npx expo run:ios
+npm run prebuild:android
 ```
 
-Native modules require a development build; Expo Go is not sufficient. `npm start` builds the offline processing engine first. `eas.json` provides example EAS build profiles. Set the final Android package and iOS bundle identifiers before release. No store publishing has been performed.
+The second command builds the offline document engine and generates the `android/` project. In Android Studio choose **Open** and select the generated `android` folder. Allow Gradle to sync, select an emulator or device and run the app. For a development build, start the JavaScript server from a second terminal in the repository root:
 
-## Current status
+```sh
+npm start
+```
 
-- Catalog is imported from `../HindPDF-Frontend`, including 39 tools and 12 sourced application guidance entries. Run `node scripts/import-catalog.cjs` when the website catalog changes.
-- Native screens, file picker, camera, email authentication, file list, reader, native share/save, and processing code have been drafted. Device processing uses a bundled, offline WebView as a computation engine; the visible application is React Native. Server tools use the existing HTTPS API.
-- Website tools PDF-to-PowerPoint and secure redaction are marked unavailable there and here. Mobile password protection, repair and HTML-to-PDF remain disabled until verified and hardened. Other tools are implemented as first-pass versions, and may not have full website parity; all require real-device verification.
-- Profile editing, password change, email verification, deletion request/recovery, payment history and refund request code are present but require integration and device testing. Payment checkout, coupons, Google/Facebook sign-in and website-specific editor interactions are not implemented yet. Payment distribution must follow the applicable app-store rules.
-- Drawing, PDF rendering, large files, offline engine and iOS/Android permissions need device testing. Output from unlock is rasterized and can lose selectable text; it should be tested with protected samples before release.
-- No production backend or existing website files were modified. 
+Alternatively, `npm run android` generates and runs the Android project from the terminal. The generated `android/` folder is deliberately not committed; run prebuild after cloning or when native configuration changes. Android Studio, Android SDK and Java are required locally. Expo Go cannot run the native PDF and file modules used by this app.
+
+On macOS, `npm run ios` generates and runs the iOS development project with Xcode and CocoaPods installed. No production signing is configured.
+
+## Checks
+
+`npm run engine`, `npm run typecheck`, and `npm test` check the offline engine bundle, TypeScript and page selection. GitHub Actions also exports Android and iOS JavaScript bundles and compiles an Android debug build. The bundle and compiler checks do not exercise the UI or live services on a device.
+
+## Configuration and current coverage
+
+The API defaults to `https://api.hindpdf.com`. Copy `.env.example` to `.env` only when changing configuration; variables prefixed `EXPO_PUBLIC_` are included in the app and must never contain secrets. Email sign-in uses the existing Firebase project. Google and Facebook sign-in buttons appear only when their respective public client IDs are configured, and require correct Firebase/provider settings and redirect registration for the mobile application; these integrations need device testing.
+
+The app contains the website tool catalog, local PDF operations, server conversion integration, camera/file selection, viewer, saved files, account details, email authentication, deletion recovery, payment history and refund requests. This is still a first implementation and does not have complete feature parity with the website. Native device, live backend and account flows need end-to-end tests before release. Website PDF-to-PowerPoint and secure redaction are unavailable; password protection, PDF repair and HTML-to-PDF remain disabled in this mobile implementation. Paid checkout, coupons and the website's detailed editor interactions are not implemented. Unlocking converts pages to images, which can lose selectable text.
+
+To refresh the copied website tool catalog and government guidance, place a checkout of `HindPDF-Frontend` alongside this repository and run `node scripts/import-catalog.cjs`. The app does not depend on that checkout at runtime. No backend or website deployment is performed by this project.
