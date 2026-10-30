@@ -88,3 +88,37 @@ All file actions and options below are design requirements. Existing code must b
 - Files: filters and sorting for files actually saved on the device; no invented fixed quota, cloud storage or syncing. Actions include open, save/share and delete where supported.
 - Account: profile, plan, payment history, refund requests, settings/help and sign-out; signed-out state offers sign-in and registration. Sensitive actions require identity verification and confirmation. Payment and social-login controls depend on available platform configuration.
 - Every screen also needs loading, empty, offline and error states. Preserve accessibility font scaling and screen-reader labels. Do not rely solely on color.
+
+## Additional UX checklist and priorities
+
+The user supplied a broader reference checklist. It contains detailed entries for design system, header and home, while the remaining categories are collapsed and their individual items are not available. Treat this section as design guidance, not an assertion that all 325 items are specified or implemented. Current scope is the Android/iOS mobile app; do not infer a request for a web app or PWA.
+
+### Approved decisions take precedence
+
+- Keep only the compact HindPDF wordmark and search icon in the top header. Do not add header subtitles, a visible search bar, avatar or notification indicator unless requested later.
+- Keep the approved red, soft slate-blue and off-white theme and the five bottom destinations with Scan in the middle. Preserve compact but legible text and support operating-system text scaling.
+- Use friendly messages next to the relevant control. Do not show raw API responses to users.
+- Do not present preview screens for approval unless the user asks to see them again.
+
+### P0 — complete a reliable document journey
+
+- Make choosing a supported file, selecting options, processing, opening and saving/sharing the actual output straightforward; retain inputs after recoverable failures.
+- Use truthful validation, loading, success, failure and empty states. Clearly identify unavailable tools. Keep the selected file and result accessible while navigating within the task.
+- Design each tool according to its table above. Verify backend behavior, permissions and output before enabling the associated UI.
+
+### P1 — quality and inclusion
+
+- Use a shared palette, typography scale, spacing and component states. Support screen readers, focus order, dynamic text and practical touch targets; do not depend on color alone.
+- Adapt to phone sizes, tablets, orientation, safe areas and the software keyboard. Respect reduced motion. Show determinate progress only when a trustworthy value exists.
+- Explain camera access, local versus server processing where a user needs to decide, network failure, size/format restrictions and relevant privacy choices in plain language.
+- Test real devices, slow or interrupted networks, large files, process recovery and low storage; verify behavior rather than treating a visual mockup as a finished feature.
+
+### P2 — polish, after core flows work
+
+- Consider theme selection, favorites, recent tools, task continuity and subtle interaction feedback; check feasibility, privacy and product requirements before adding them. Keep animations optional and short.
+- Design empty states, help, result actions, sorting and keyboard navigation consistently across screens.
+
+### P3 — advanced features, subject to a separate decision
+
+- Batch processing, chained workflows, cloud integrations, personalized recommendations and other advanced features require product and technical definition before they are promised or implemented.
+- Confirm any new capability against the existing backend and platform requirements. Never invent availability, storage quotas or results.
