@@ -1,0 +1,22 @@
+name: Diagnose Android modules
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/android-diagnostics.yml'
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Inspect module publications
+        run: |
+          npx expo-modules-autolinking resolve --platform android --json > /tmp/hind-modules.json
+          node -e "const d=require('/tmp/hind-modules.json');for(const [i,m] of d.modules.entries()){console.log(i, m.packageName, JSON.stringify(m.projects?.map(p=>({name:p.name,publication:p.publication}))));}"
