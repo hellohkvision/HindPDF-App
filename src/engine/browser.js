@@ -8,6 +8,7 @@ import {pageIndices,positive} from './ranges.cjs';
 import {pixels} from '../utils/dimensions.cjs';
 import {applyScanFilter} from './scan-filters.cjs';
 import {scanLayout} from './scan-layout.cjs';
+import {detectPage} from './scan-detect.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -52,6 +53,12 @@ async function resized(file,o) {
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
+ if(id==='scan-detect') {
+  const img=await image(files[0]),scale=Math.min(1,800/Math.max(img.width,img.height)),c=canvas(Math.max(1,Math.round(img.width*scale)),Math.max(1,Math.round(img.height*scale))),ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);const result=detectPage(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height);cleanCanvas(c);if(!result)throw Error('Page edges are unclear. Adjust the crop manually.');return {data:new TextEncoder().encode(JSON.stringify(result)),ext:'.json',mime:'application/json'};
+ }
+ if(id==='scan-sign') {
+  const img=await image(files[0]),c=canvas(img.width,img.height),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);ctx.save();ctx.translate(c.width*.62,c.height*.8);const signatureScale=Math.min(c.width*.32/300,c.height*.16/130);ctx.scale(signatureScale,signatureScale);ctx.strokeStyle='#14263b';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';for(const path of o.signaturePaths||[])ctx.stroke(new Path2D(path));ctx.restore();const result=bytes(c.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(c);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+ }
  if(id==='scan-enhance') {
   const img=await image(files[0]),c=canvas(img.width,img.height),ctx=c.getContext('2d');
   ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);

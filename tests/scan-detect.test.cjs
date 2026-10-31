@@ -1,0 +1,2 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {detectPage}=require('../src/engine/scan-detect.cjs');
+test('detects an outlined paper and rejects a blank image',()=>{const w=100,h=100,d=new Uint8ClampedArray(w*h*4);for(let y=20;y<80;y++)for(let x=15;x<85;x++){let i=(y*w+x)*4;d[i]=d[i+1]=d[i+2]=240;}const r=detectPage(d,w,h);assert.ok(r);assert.ok(Math.abs(r.left-15)<3);assert.ok(Math.abs(r.top-20)<3);assert.equal(detectPage(new Uint8ClampedArray(w*h*4),w,h),null);});

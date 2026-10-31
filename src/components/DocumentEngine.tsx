@@ -34,7 +34,7 @@ export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,r
   if(m.type==='error'){fail(m.message);return;}
   if(m.type==='result'){
    clearTimeout(p.timer);
-   try{const temporary=p.tool.id==='scan-enhance';if(!temporary)await prepareOutputDirectory();const name=p.tool.id==='scan-to-pdf'?(p.scanName.trim().replace(/[^a-zA-Z0-9 _.-]/g,'_').replace(/\.pdf$/i,'').slice(0,80)||'Scanned document')+'.pdf':'HindPDF_'+p.tool.id+m.ext,uri=temporary?FileSystem.cacheDirectory+'scan-'+Crypto.randomUUID()+m.ext:outputUri(name);await FileSystem.writeAsStringAsync(uri,m.base64,{encoding:FileSystem.EncodingType.Base64});const info=await FileSystem.getInfoAsync(uri);p.resolve({uri,name,mime:m.mime,size:info.exists?info.size:0,tool:p.tool.name,createdAt:new Date().toISOString()});}catch(e){p.reject(e as Error);}finally{pending.current=null;}
+   try{const temporary=['scan-enhance','scan-detect','scan-sign'].includes(p.tool.id);if(!temporary)await prepareOutputDirectory();const name=p.tool.id==='scan-to-pdf'?(p.scanName.trim().replace(/[^a-zA-Z0-9 _.-]/g,'_').replace(/\.pdf$/i,'').slice(0,80)||'Scanned document')+'.pdf':'HindPDF_'+p.tool.id+m.ext,uri=temporary?FileSystem.cacheDirectory+'scan-'+Crypto.randomUUID()+m.ext:outputUri(name);await FileSystem.writeAsStringAsync(uri,m.base64,{encoding:FileSystem.EncodingType.Base64});const info=await FileSystem.getInfoAsync(uri);p.resolve({uri,name,mime:m.mime,size:info.exists?info.size:0,tool:p.tool.name,createdAt:new Date().toISOString()});}catch(e){p.reject(e as Error);}finally{pending.current=null;}
   }
  }}/></View>;
 });
