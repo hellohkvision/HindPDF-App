@@ -54,3 +54,5 @@ jobs:
           path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 7
+
+# Standalone APK for device preview; the app does not require a development server.
