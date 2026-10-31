@@ -8,8 +8,8 @@ import {api} from '../services/api';
 import {Button,Card,Chips,Field,s} from './ui';
 type Pending={uid:string;orderId:string;planId:string};
 const pendingKey='hindpdf.mobile.pendingPayment';
-export function Checkout({user,onError,onRefresh}:{user:User;onError:(s:string)=>void;onRefresh:()=>void}){
- const [plan,setPlan]=useState('MONTHLY'),[coupon,setCoupon]=useState(''),[quote,setQuote]=useState<any>(null),[upgrade,setUpgrade]=useState('no'),[busy,setBusy]=useState(false),[pending,setPending]=useState<Pending|null>(null);
+export function Checkout({user,onError,onRefresh,initialPlan='MONTHLY'}:{user:User;onError:(s:string)=>void;onRefresh:()=>void;initialPlan?:string}){
+ const [plan,setPlan]=useState(initialPlan),[coupon,setCoupon]=useState(''),[quote,setQuote]=useState<any>(null),[upgrade,setUpgrade]=useState('no'),[busy,setBusy]=useState(false),[pending,setPending]=useState<Pending|null>(null);
  useEffect(()=>{AsyncStorage.getItem(pendingKey).then(v=>{try{setPending(v?JSON.parse(v):null);}catch{}});},[]);
  const wrap=async(f:()=>Promise<void>)=>{setBusy(true);onError('');try{await f();}catch(e){onError((e as Error).message||'Payment could not be started.');}finally{setBusy(false);}};
  const save=async(p:Pending|null)=>{setPending(p);if(p)await AsyncStorage.setItem(pendingKey,JSON.stringify(p));else await AsyncStorage.removeItem(pendingKey);};

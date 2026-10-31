@@ -1,6 +1,8 @@
-export type Tool = { id: string; name: string; desc: string; catKey: string; tier: string; color: string; accept: string; ext: string; mime: string; multiple: boolean; location: string; available: boolean };
+export type Tool = { id: string; name: string; desc: string; catKey: string; tier: string; color: string; accept: string; ext: string; mime: string; multiple: boolean; location: string; available: boolean; keywords?: string[] };
 export type InputFile = { uri: string; name: string; mimeType: string; size: number };
 export type ScanDraft = { id: string; name: string; pages: InputFile[]; updatedAt: string };
-export type OutputFile = { uri: string; name: string; mime: string; size: number; tool: string; createdAt: string };
+export type PdfSearchHit = {page:number;x:number;y:number;pdfX:number;pdfY:number};
+export type PdfSearchResult = {uri:string;matches:PdfSearchHit[];total:number};
+export type OutputFile = { uri: string; name: string; mime: string; size: number; tool: string; createdAt: string; searchMatches?: PdfSearchHit[]; searchTotal?: number };
 export type ToolOptions = { pages: string; angle: string; text: string; x: string; y: string; fontSize: string; width: string; height: string; unit: string; dpi: string; targetKB: string; minKB: string; margin: string; password: string; confirmPassword: string; format: string; language: string; preset: string; layout: string; borderless: string; signature?: InputFile; signaturePaths?: string[]; photoWidth: string; photoHeight: string; photoKB: string; scanName: string; scanPaper: string; scanQuality: string };
 export const defaultOptions: ToolOptions = { pages: '', angle: '90', text: '', x: '40', y: '40', fontSize: '18', width: '', height: '', unit: 'px', dpi: '300', targetKB: '', minKB: '', margin: '24', password: '', confirmPassword: '', format: 'jpg', language: 'eng', preset: 'recommended', layout: 'original', borderless: 'false', photoWidth: '', photoHeight: '', photoKB: '', scanName: 'Scanned document', scanPaper: 'a4', scanQuality: 'high' };

@@ -62,86 +62,6 @@
     "available": true
   },
   {
-    "id": "pdf-to-jpg",
-    "slug": "pdf-to-jpg",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "PDF to JPG",
-    "tier": "free",
-    "desc": "Extract each page of your PDF into high-quality JPG images.",
-    "color": "#ec4899",
-    "prefix": "Images_",
-    "ext": ".zip",
-    "mime": "application/zip",
-    "cat": "image_zip",
-    "accept": ".pdf",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "jpg-to-pdf",
-    "slug": "jpg-to-pdf",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "JPG to PDF",
-    "tier": "free",
-    "desc": "Convert JPG, JPEG, and PNG images into one PDF.",
-    "color": "#9333ea",
-    "prefix": "Converted_",
-    "ext": ".pdf",
-    "mime": "application/pdf",
-    "cat": "pdf",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": true,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "pdf-to-png",
-    "slug": "pdf-to-png",
-    "catKey": "core",
-    "persona": [
-      "business"
-    ],
-    "name": "PDF to PNG",
-    "tier": "free",
-    "desc": "Convert PDF pages into clear PNG images.",
-    "color": "#06b6d4",
-    "prefix": "Images_PNG_",
-    "ext": ".zip",
-    "mime": "application/zip",
-    "cat": "image_zip",
-    "accept": ".pdf",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "png-to-pdf",
-    "slug": "png-to-pdf",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "PNG to PDF",
-    "tier": "free",
-    "desc": "Combine PNG, JPG, and JPEG images into one PDF.",
-    "color": "#3b82f6",
-    "prefix": "Images_to_",
-    "ext": ".pdf",
-    "mime": "application/pdf",
-    "cat": "pdf",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": true,
-    "location": "device",
-    "available": true
-  },
-  {
     "id": "image-to-pdf",
     "slug": "image-to-pdf",
     "catKey": "core",
@@ -159,7 +79,13 @@
     "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
     "multiple": true,
     "location": "device",
-    "available": true
+    "available": true,
+    "keywords": [
+      "jpg to pdf",
+      "jpeg to pdf",
+      "png to pdf",
+      "photos to pdf"
+    ]
   },
   {
     "id": "photo-resizer",
@@ -168,9 +94,9 @@
     "persona": [
       "students"
     ],
-    "name": "Photo Resizer",
+    "name": "Resize & Compress Image",
     "tier": "free",
-    "desc": "Resize and optimize a photo for an application upload.",
+    "desc": "Resize and compress photos, signatures, thumb impressions and other images.",
     "color": "#ea580c",
     "prefix": "Prepared_photo_",
     "ext": ".jpg",
@@ -179,87 +105,16 @@
     "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
     "multiple": false,
     "location": "device",
-    "available": true
-  },
-  {
-    "id": "photo-compressor",
-    "slug": "photo-compressor",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "Compress Photo",
-    "tier": "free",
-    "desc": "Reduce an image file size while keeping it clear.",
-    "color": "#0f3d64",
-    "prefix": "Compressed_photo_",
-    "ext": ".jpg",
-    "mime": "image/jpeg",
-    "cat": "image",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "signature-resizer",
-    "slug": "signature-resizer",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "Signature Resizer",
-    "tier": "free",
-    "desc": "Resize and optimize a handwritten signature image.",
-    "color": "#0f172a",
-    "prefix": "Prepared_signature_",
-    "ext": ".jpg",
-    "mime": "image/jpeg",
-    "cat": "image",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "thumb-impression-resizer",
-    "slug": "thumb-impression-resizer",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "Thumb Impression Resizer",
-    "tier": "free",
-    "desc": "Prepare a thumb impression image for an application upload.",
-    "color": "#0f3d64",
-    "prefix": "Prepared_thumb_",
-    "ext": ".jpg",
-    "mime": "image/jpeg",
-    "cat": "image",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
-    "id": "declaration-optimizer",
-    "slug": "declaration-optimizer",
-    "catKey": "core",
-    "persona": [
-      "students"
-    ],
-    "name": "Declaration Optimizer",
-    "tier": "free",
-    "desc": "Optimize a handwritten declaration image for upload.",
-    "color": "#0f3d64",
-    "prefix": "Prepared_declaration_",
-    "ext": ".jpg",
-    "mime": "image/jpeg",
-    "cat": "image",
-    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
-    "multiple": false,
-    "location": "device",
-    "available": true
+    "available": true,
+    "keywords": [
+      "photo resizer",
+      "resize photo",
+      "compress photo",
+      "image compressor",
+      "signature resizer",
+      "thumb impression resizer",
+      "declaration optimizer"
+    ]
   },
   {
     "id": "photo-signature-prep",
@@ -299,7 +154,13 @@
     "accept": ".pdf",
     "multiple": false,
     "location": "device",
-    "available": true
+    "available": true,
+    "keywords": [
+      "pdf to jpg",
+      "pdf to jpeg",
+      "pdf to png",
+      "convert pdf to pictures"
+    ]
   },
   {
     "id": "word-to-pdf",
@@ -547,26 +408,6 @@
     "available": true
   },
   {
-    "id": "edit-pdf",
-    "slug": "edit-pdf",
-    "catKey": "edit",
-    "persona": [
-      "business"
-    ],
-    "name": "Edit PDF",
-    "tier": "freemium",
-    "desc": "Add notes, annotations, and marks to pages.",
-    "color": "#3b82f6",
-    "prefix": "Edited_",
-    "ext": ".pdf",
-    "mime": "application/pdf",
-    "cat": "pdf",
-    "accept": ".pdf",
-    "multiple": false,
-    "location": "device",
-    "available": true
-  },
-  {
     "id": "add-text",
     "slug": "add-text-to-pdf",
     "catKey": "edit",
@@ -584,7 +425,12 @@
     "accept": ".pdf",
     "multiple": false,
     "location": "device",
-    "available": true
+    "available": true,
+    "keywords": [
+      "edit pdf",
+      "add notes",
+      "add text to pdf"
+    ]
   },
   {
     "id": "add-watermark",

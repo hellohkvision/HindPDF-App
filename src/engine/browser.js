@@ -10,7 +10,7 @@ import {applyScanFilter} from './scan-filters.cjs';
 import {scanLayout} from './scan-layout.cjs';
 import {detectPage} from './scan-detect.cjs';
 import {projectiveCoefficients,mapPoint} from './perspective.cjs';
-import {matchesPage} from './pdf-search.cjs';
+import {searchAndHighlight} from './pdf-highlights.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -55,11 +55,7 @@ async function resized(file,o) {
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
- if(id==='pdf-search') {
-  if(!o.text.trim())throw Error('Enter text to search.');
-  const doc=await pdfjs.getDocument({data:bytes(files[0].base64),isEvalSupported:false,useSystemFonts:true}).promise,pages=[];
-  try {for(let i=1;i<=doc.numPages;i++){const page=await doc.getPage(i),content=await page.getTextContent();if(matchesPage(content.items,o.text))pages.push(i);page.cleanup();progress(i/doc.numPages);}return {data:new TextEncoder().encode(JSON.stringify(pages)),ext:'.json',mime:'application/json'};} finally {await doc.destroy();}
- }
+ if(id==='pdf-search')return searchAndHighlight(bytes(files[0].base64),o.text,{pdfjs,PDFDocument,rgb,degrees},progress);
  if(id==='scan-crop') {
   const img=await image(files[0]),points=o.cropPoints,t=projectiveCoefficients(points),dist=(a,b)=>Math.hypot((a.x-b.x)*img.width,(a.y-b.y)*img.height),w=Math.max(1,Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2])))),h=Math.max(1,Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2]))));
   const source=canvas(img.width,img.height),sx=source.getContext('2d');sx.drawImage(img,0,0);const input=sx.getImageData(0,0,img.width,img.height).data,out=canvas(w,h),ctx=out.getContext('2d'),pixels=ctx.createImageData(w,h),d=pixels.data;
@@ -139,7 +135,7 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
 let running=false;
 window.hindRun=async request=>{
  if(running)return;running=true;
- try {const result=await processDocument(request.tool,request.files,request.options,p=>send({type:'progress',id:request.id,value:Math.round(p*100)}));send({type:'result',id:request.id,base64:base64(result.data),ext:result.ext,mime:result.mime});}
+ try {const result=await processDocument(request.tool,request.files,request.options,p=>send({type:'progress',id:request.id,value:Math.round(p*100)}));send({type:'result',id:request.id,base64:base64(result.data),ext:result.ext,mime:result.mime,searchMatches:result.searchMatches,searchTotal:result.searchTotal});}
  catch(error){send({type:'error',id:request.id,message:error.message||'Unable to process document.'});}
  finally {running=false;}
 };
