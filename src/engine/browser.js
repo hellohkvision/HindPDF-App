@@ -6,6 +6,7 @@ import {jsPDF} from 'jspdf';
 import JSZip from 'jszip';
 import {pageIndices,positive} from './ranges.cjs';
 import {pixels} from '../utils/dimensions.cjs';
+import {applyScanFilter} from './scan-filters.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -50,6 +51,13 @@ async function resized(file,o) {
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
+ if(id==='scan-enhance') {
+  const img=await image(files[0]),c=canvas(img.width,img.height),ctx=c.getContext('2d');
+  ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);
+  const pixels=ctx.getImageData(0,0,c.width,c.height),d=pixels.data;
+  applyScanFilter(d,o.preset);
+  ctx.putImageData(pixels,0,0);const result=bytes(c.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(c);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+ }
  if(id==='pdf-to-ppt'||id==='redact')throw Error('This tool is unavailable on HindPDF.');
  if(['pdf-to-jpg','pdf-to-png','pdf-to-image','unlock','protect-password','repair-pdf'].includes(id)) {
   if(id==='protect-password'&&(!o.password||o.password.length<8||o.password!==o.confirmPassword))throw Error('Use a password of at least 8 characters and confirm it.');
