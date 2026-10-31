@@ -8,6 +8,9 @@ on:
       - '.github/workflows/preview-apk.yml'
       - 'app.config.ts'
       - 'assets/**'
+      - 'src/**'
+      - 'App.tsx'
+      - 'package.json'
 
 permissions:
   contents: read
