@@ -9,6 +9,7 @@ import {pixels} from '../utils/dimensions.cjs';
 import {applyScanFilter} from './scan-filters.cjs';
 import {scanLayout} from './scan-layout.cjs';
 import {detectPage} from './scan-detect.cjs';
+import {projectiveCoefficients,mapPoint} from './perspective.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -53,6 +54,12 @@ async function resized(file,o) {
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
+ if(id==='scan-crop') {
+  const img=await image(files[0]),points=o.cropPoints,t=projectiveCoefficients(points),dist=(a,b)=>Math.hypot((a.x-b.x)*img.width,(a.y-b.y)*img.height),w=Math.max(1,Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2])))),h=Math.max(1,Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2]))));
+  const source=canvas(img.width,img.height),sx=source.getContext('2d');sx.drawImage(img,0,0);const input=sx.getImageData(0,0,img.width,img.height).data,out=canvas(w,h),ctx=out.getContext('2d'),pixels=ctx.createImageData(w,h),d=pixels.data;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const p=mapPoint(t,w===1?0:x/(w-1),h===1?0:y/(h-1)),px=Math.max(0,Math.min(img.width-1,p.x*(img.width-1))),py=Math.max(0,Math.min(img.height-1,p.y*(img.height-1))),x0=Math.floor(px),y0=Math.floor(py),x1=Math.min(img.width-1,x0+1),y1=Math.min(img.height-1,y0+1),fx=px-x0,fy=py-y0,di=(y*w+x)*4;for(let k=0;k<4;k++){const a=input[(y0*img.width+x0)*4+k]*(1-fx)+input[(y0*img.width+x1)*4+k]*fx,b=input[(y1*img.width+x0)*4+k]*(1-fx)+input[(y1*img.width+x1)*4+k]*fx;d[di+k]=a*(1-fy)+b*fy;}}
+  ctx.putImageData(pixels,0,0);const result=bytes(out.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(source);cleanCanvas(out);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+ }
  if(id==='scan-detect') {
   const img=await image(files[0]),scale=Math.min(1,800/Math.max(img.width,img.height)),c=canvas(Math.max(1,Math.round(img.width*scale)),Math.max(1,Math.round(img.height*scale))),ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);const result=detectPage(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height);cleanCanvas(c);if(!result)throw Error('Page edges are unclear. Adjust the crop manually.');return {data:new TextEncoder().encode(JSON.stringify(result)),ext:'.json',mime:'application/json'};
  }

@@ -1,0 +1,2 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {projectiveCoefficients,mapPoint}=require('../src/engine/perspective.cjs');
+test('maps all crop corners and rejects crossing corners',()=>{const p=[{x:.1,y:.2},{x:.9,y:.1},{x:.8,y:.9},{x:.2,y:.8}],t=projectiveCoefficients(p);[[0,0],[1,0],[1,1],[0,1]].forEach(([u,v],i)=>{const q=mapPoint(t,u,v);assert.ok(Math.abs(q.x-p[i].x)<1e-8);assert.ok(Math.abs(q.y-p[i].y)<1e-8)});assert.throws(()=>projectiveCoefficients([p[0],p[2],p[1],p[3]]));});
