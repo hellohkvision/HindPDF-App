@@ -1,0 +1,2 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {accepts}=require('../src/utils/file-types.cjs');
+test('recognizes selected PDF and image types',()=>{assert.equal(accepts('.pdf',{name:'FILE.PDF',mimeType:'application/octet-stream'}),true);assert.equal(accepts('.pdf',{name:'unknown',mimeType:'application/pdf'}),true);assert.equal(accepts('image/jpeg,image/png,.jpg,.jpeg,.png',{name:'photo.pdf',mimeType:'application/pdf'}),false);assert.equal(accepts('image/*,.pdf',{name:'photo',mimeType:'image/jpeg'}),true);});

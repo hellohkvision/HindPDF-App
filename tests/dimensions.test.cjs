@@ -1,0 +1,3 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {pixels,convert}=require('../src/utils/dimensions.cjs');
+test('converts physical units using the chosen DPI',()=>{assert.equal(pixels('2.54','cm','300'),300);assert.equal(pixels('1','in','300'),300);assert.equal(pixels('150','px',''),150);assert.equal(convert('300','px','in','300'),'1');assert.equal(convert('300','px','cm','300'),'2.54');});
+test('preserves optional empty dimensions and validates inputs',()=>{assert.equal(pixels('','cm','300'),'');for(const args of [['0','px','300'],['1.5','px','300'],['1','cm','0'],['100','in','300'],['1','mm','300']])assert.throws(()=>pixels(...args));});

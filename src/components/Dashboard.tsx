@@ -17,7 +17,15 @@ const icons:Record<string,React.ComponentProps<typeof Ionicons>['name']>={
  ocr:'scan-circle-outline','pdf-reader':'book-outline','repair-pdf':'build-outline','html-to-pdf':'code-slash-outline'
 };
 const unavailable=new Set(['protect-password','html-to-pdf','repair-pdf']);
-export function ToolIcon({id,size=22}:{id:string;size?:number}){return <View style={styles.icon}><Ionicons name={icons[id]||'document-outline'} size={size} color={id==='merge'||id==='sign'?colors.primary:colors.blue}/></View>;}
+const palettes:Record<string,{ink:string;bg:string}>={red:{ink:'#db3440',bg:'#fff0f1'},blue:{ink:'#2868b6',bg:'#e9f2ff'},green:{ink:'#168261',bg:'#e7f6ef'},purple:{ink:'#7950bc',bg:'#f1eafd'},orange:{ink:'#c65a1b',bg:'#fff0e4'},teal:{ink:'#087f8c',bg:'#e5f7f8'}};
+const iconColor:Record<string,string>={
+ merge:'red',split:'orange',compress:'green','pdf-to-jpg':'purple','jpg-to-pdf':'purple','pdf-to-png':'teal','png-to-pdf':'teal','image-to-pdf':'purple',
+ 'photo-resizer':'orange','photo-compressor':'orange','signature-resizer':'teal','thumb-impression-resizer':'teal','declaration-optimizer':'orange','photo-signature-prep':'purple','pdf-to-image':'purple',
+ 'word-to-pdf':'blue','pdf-to-word':'blue','excel-to-pdf':'green','pdf-to-excel':'green','ppt-to-pdf':'orange','pdf-to-ppt':'orange',
+ rotate:'blue','delete-pages':'red','extract-pages':'teal','reorder-pages':'purple','page-numbers':'blue','crop-pdf':'orange','edit-pdf':'blue','add-text':'purple','add-watermark':'purple',
+ 'protect-password':'orange',unlock:'green',sign:'red',redact:'red','scan-to-pdf':'teal',ocr:'purple','pdf-reader':'blue','repair-pdf':'orange','html-to-pdf':'blue'
+};
+export function ToolIcon({id,size=22}:{id:string;size?:number}){const p=palettes[iconColor[id]||'blue'];return <View style={[styles.icon,{backgroundColor:p.bg}]}><Ionicons name={icons[id]||'document-outline'} size={size} color={p.ink}/></View>;}
 export function Dashboard({tools,outputs,onTool,onAll,onFiles,onScan,onChoose}:{tools:Tool[];outputs:OutputFile[];onTool:(t:Tool)=>void;onAll:()=>void;onFiles:()=>void;onScan:()=>void;onChoose:()=>void}){
  const find=(id:string)=>tools.find(t=>t.id===id);return <>
  <View style={styles.hero}><Text style={styles.headline}>Your documents,{"\n"}<Text style={{color:colors.primary}}>made easy</Text></Text><Text style={s.body}>Scan or choose a file to get started.</Text><View style={styles.actions}><Pressable style={styles.primary} accessibilityRole="button" onPress={onScan}><Ionicons name="camera-outline" size={19} color="white"/><Text style={styles.primaryText}>Scan document</Text></Pressable><Pressable style={styles.outline} accessibilityRole="button" onPress={onChoose}><Ionicons name="folder-outline" size={19} color={colors.ink}/><Text style={styles.outlineText}>Choose file</Text></Pressable></View></View>

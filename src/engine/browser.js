@@ -5,6 +5,7 @@ import * as pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
 import {jsPDF} from 'jspdf';
 import JSZip from 'jszip';
 import {pageIndices,positive} from './ranges.cjs';
+import {pixels} from '../utils/dimensions.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -33,7 +34,7 @@ async function raster(file, o, progress, kind) {
  } finally {await source.destroy();}
 }
 async function resized(file,o) {
- const img=await image(file);let w=Math.round(positive(o.width,img.width,10000)),h=Math.round(positive(o.height,img.height,10000));
+ const img=await image(file);let w=pixels(o.width,o.unit||'px',o.dpi===undefined?'300':o.dpi)||img.width,h=pixels(o.height,o.unit||'px',o.dpi===undefined?'300':o.dpi)||img.height;
  if(o.width&&!o.height)h=Math.max(1,Math.round(img.height*w/img.width));
  if(o.height&&!o.width)w=Math.max(1,Math.round(img.width*h/img.height));
  const c=canvas(w,h),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
