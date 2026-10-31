@@ -7,6 +7,7 @@ import JSZip from 'jszip';
 import {pageIndices,positive} from './ranges.cjs';
 import {pixels} from '../utils/dimensions.cjs';
 import {applyScanFilter} from './scan-filters.cjs';
+import {scanLayout} from './scan-layout.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -76,7 +77,7 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
  } else if(['jpg-to-pdf','png-to-pdf','image-to-pdf','scan-to-pdf'].includes(id)) {
   for(let i=0;i<files.length;i++) {
    if(files[i].mimeType==='application/pdf'){const src=await PDFDocument.load(bytes(files[i].base64));for(const p of await output.copyPages(src,src.getPageIndices()))output.addPage(p);}
-   else {const f=files[i];const img=f.mimeType==='image/png'?await output.embedPng(bytes(f.base64)):await output.embedJpg(bytes(f.base64));const page=output.addPage([595.28,841.89]);const dim=img.scaleToFit(547.28,793.89);page.drawImage(img,{x:(page.getWidth()-dim.width)/2,y:(page.getHeight()-dim.height)/2,...dim});}
+   else {const f=files[i];let img;if(id==='scan-to-pdf'&&o.scanQuality!=='high'){const source=await image(f),max=o.scanQuality==='small'?1600:2400,scale=Math.min(1,max/Math.max(source.width,source.height));const c=canvas(Math.max(1,Math.round(source.width*scale)),Math.max(1,Math.round(source.height*scale))),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(source,0,0,c.width,c.height);img=await output.embedJpg(bytes(c.toDataURL('image/jpeg',o.scanQuality==='small'?.68:.84).split(',')[1]));cleanCanvas(c);}else img=f.mimeType==='image/png'?await output.embedPng(bytes(f.base64)):await output.embedJpg(bytes(f.base64));const layout=id==='scan-to-pdf'?scanLayout(o.scanPaper,img.width,img.height):{width:595.28,height:841.89,margin:24};const page=output.addPage([layout.width,layout.height]);const dim=img.scaleToFit(layout.width-2*layout.margin,layout.height-2*layout.margin);page.drawImage(img,{x:(page.getWidth()-dim.width)/2,y:(page.getHeight()-dim.height)/2,...dim});}
    progress((i+1)/files.length);
   }
  } else {

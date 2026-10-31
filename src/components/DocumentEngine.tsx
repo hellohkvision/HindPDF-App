@@ -9,7 +9,7 @@ import type {InputFile,OutputFile,Tool,ToolOptions} from '../types';
 export type EngineHandle={run:(tool:Tool,files:InputFile[],options:ToolOptions,onProgress:(n:number)=>void)=>Promise<OutputFile>};
 export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,ref){
  const view=useRef<WebView>(null);const [ready,setReady]=useState(false);
- const pending=useRef<{id:string;resolve:(v:OutputFile)=>void;reject:(e:Error)=>void;progress:(n:number)=>void;tool:Tool;timer:ReturnType<typeof setTimeout>}|null>(null);
+ const pending=useRef<{id:string;resolve:(v:OutputFile)=>void;reject:(e:Error)=>void;progress:(n:number)=>void;tool:Tool;scanName:string;timer:ReturnType<typeof setTimeout>}|null>(null);
  const fail=(message:string)=>{if(pending.current){clearTimeout(pending.current.timer);pending.current.reject(Error(message));pending.current=null;}};
  React.useEffect(()=>()=>fail('Document engine closed.'),[]);
  useImperativeHandle(ref,()=>({run:async(tool,files,options,onProgress)=>{
@@ -21,7 +21,7 @@ export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,r
   const signature=options.signature?{...options.signature,base64:await FileSystem.readAsStringAsync(options.signature.uri,{encoding:FileSystem.EncodingType.Base64})}:undefined;
   const id=Crypto.randomUUID();
   return new Promise<OutputFile>((resolve,reject)=>{
-   pending.current={id,resolve,reject,progress:onProgress,tool,timer:setTimeout(()=>{fail('This document took too long. Try fewer pages.');view.current?.reload();setReady(false);},300000)};
+   pending.current={id,resolve,reject,progress:onProgress,tool,scanName:options.scanName,timer:setTimeout(()=>{fail('This document took too long. Try fewer pages.');view.current?.reload();setReady(false);},300000)};
    const request=JSON.stringify({id,tool,files:encoded,options:{...options,signature,ownerPassword:Crypto.randomUUID()}}).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
    view.current?.injectJavaScript(`window.hindRun(${request});true;`);
   });
@@ -34,7 +34,7 @@ export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,r
   if(m.type==='error'){fail(m.message);return;}
   if(m.type==='result'){
    clearTimeout(p.timer);
-   try{const temporary=p.tool.id==='scan-enhance';if(!temporary)await prepareOutputDirectory();const name='HindPDF_'+p.tool.id+m.ext,uri=temporary?FileSystem.cacheDirectory+'scan-'+Crypto.randomUUID()+m.ext:outputUri(name);await FileSystem.writeAsStringAsync(uri,m.base64,{encoding:FileSystem.EncodingType.Base64});const info=await FileSystem.getInfoAsync(uri);p.resolve({uri,name,mime:m.mime,size:info.exists?info.size:0,tool:p.tool.name,createdAt:new Date().toISOString()});}catch(e){p.reject(e as Error);}finally{pending.current=null;}
+   try{const temporary=p.tool.id==='scan-enhance';if(!temporary)await prepareOutputDirectory();const name=p.tool.id==='scan-to-pdf'?(p.scanName.trim().replace(/[^a-zA-Z0-9 _.-]/g,'_').replace(/\.pdf$/i,'').slice(0,80)||'Scanned document')+'.pdf':'HindPDF_'+p.tool.id+m.ext,uri=temporary?FileSystem.cacheDirectory+'scan-'+Crypto.randomUUID()+m.ext:outputUri(name);await FileSystem.writeAsStringAsync(uri,m.base64,{encoding:FileSystem.EncodingType.Base64});const info=await FileSystem.getInfoAsync(uri);p.resolve({uri,name,mime:m.mime,size:info.exists?info.size:0,tool:p.tool.name,createdAt:new Date().toISOString()});}catch(e){p.reject(e as Error);}finally{pending.current=null;}
   }
  }}/></View>;
 });
