@@ -1,0 +1,49 @@
+diff --git a/src/middleware/requireAuth.js b/src/middleware/requireAuth.js
+index 7f32373..dd64d4b 100644
+--- a/src/middleware/requireAuth.js
++++ b/src/middleware/requireAuth.js
+@@ -1,6 +1,7 @@
+ const { getDb } = require('../config/firestore');
+ const { accountClosed } = require('../services/accountState');
+ const { getFirebaseAuth } = require("../config/firebaseAdmin");
++const { guestUserId } = require('../services/guestIdentity');
+ 
+ async function requireAuth(req, res, next) {
+   const authorization = req.headers.authorization || "";
+@@ -45,15 +46,21 @@ async function requireAuth(req, res, next) {
+     });
+   }
+ 
++  let effectiveUid = token.uid;
++  if (provider === 'anonymous') {
++    if (!['/api/usage','/api/pdf'].includes(req.baseUrl)) return res.status(403).json({ok:false,code:'AUTH_REQUIRED',error:'Sign in to access this feature.'});
++    try { effectiveUid = guestUserId(req.headers['x-hindpdf-platform'], req.headers['x-hindpdf-device'], process.env.GUEST_DEVICE_HMAC_KEY); res.setHeader('X-HindPDF-Guest-Quota','v1'); }
++    catch (error) { return res.status(error.code === 'GUEST_UNAVAILABLE' ? 503 : 400).json({ok:false,code:error.code,error:error.message}); }
++  }
+   try {
+-    const account = await getDb().collection('users').doc(token.uid).get();
++    const account = await getDb().collection('users').doc(effectiveUid).get();
+     if (accountClosed(account)) return res.status(403).json({ok:false, code:'ACCOUNT_CLOSED', error:'Account deletion is in progress or complete.'});
+   } catch (error) {
+     return res.status(503).json({ok:false, code:'ACCOUNT_CHECK_UNAVAILABLE', error:'Account check is temporarily unavailable.'});
+   }
+   req.user = {
+     authTime: token.auth_time,
+-    uid: token.uid,
++    uid: effectiveUid,
+     email: token.email || null,
+     emailVerified: token.email_verified === true,
+   };
+diff --git a/src/routes/usage.js b/src/routes/usage.js
+index 518f870..57f417f 100644
+--- a/src/routes/usage.js
++++ b/src/routes/usage.js
+@@ -8,6 +8,8 @@ const {
+ 
+ const router = express.Router();
+ 
++router.get('/guest-check', requireAuth, (req, res) => res.status(200).json({ok:true}));
++
+ router.post("/reserve", requireAuth, async (req, res) => {
+   try {
+     const authorization =

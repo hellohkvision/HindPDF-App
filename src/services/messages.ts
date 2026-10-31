@@ -1,6 +1,7 @@
 import {ApiError} from './api';
 export function friendlyError(value:unknown):string {
  const error=value as {code?:string;status?:number;message?:string}; const msg=String(error?.message||'');
+ if(error?.code==='GUEST_UNAVAILABLE')return 'Guest access is temporarily unavailable. Please try again later or sign in.';
  if(error?.code==='AUTH_REQUIRED')return 'Please sign in to continue.';
  if(error?.code==='FREE_QUOTA_EXCEEDED')return "You've reached today's free limit. Try again later or view available plans.";
  if(error?.status===401||error?.status===403)return 'Please sign in again to continue.';
