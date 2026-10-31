@@ -6,6 +6,8 @@ on:
   push:
     paths:
       - '.github/workflows/preview-apk.yml'
+      - 'app.config.ts'
+      - 'assets/**'
 
 permissions:
   contents: read
