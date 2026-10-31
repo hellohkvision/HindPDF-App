@@ -1,5 +1,6 @@
+import {Text} from './AppText';
 import React,{useRef,useState} from 'react';
-import {PanResponder,View,Text} from 'react-native';
+import {PanResponder,View} from 'react-native';
 import Svg,{Path} from 'react-native-svg';
 import {Button,s} from './ui';
 export function SignaturePad({onChange}:{onChange:(paths:string[])=>void}){

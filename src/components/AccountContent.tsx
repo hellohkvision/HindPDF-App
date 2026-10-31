@@ -1,5 +1,6 @@
+import {Text} from './AppText';
 import React from 'react';
-import {Linking,Pressable,Text} from 'react-native';
+import {Linking,Pressable} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {Card,colors,s} from './ui';
 const links:[string,string,React.ComponentProps<typeof Ionicons>['name']][]=[

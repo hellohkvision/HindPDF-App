@@ -1,5 +1,7 @@
+import {useFonts,Montserrat_400Regular,Montserrat_500Medium,Montserrat_600SemiBold,Montserrat_700Bold,Montserrat_800ExtraBold,Montserrat_900Black} from '@expo-google-fonts/montserrat';
+import {Text} from './src/components/AppText';
 import React,{useEffect,useRef,useState} from 'react';
-import {ActivityIndicator,Alert,BackHandler,Linking,Pressable,ScrollView,Text,View} from 'react-native';
+import {ActivityIndicator,Alert,BackHandler,Linking,Pressable,ScrollView,View} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {SafeAreaProvider,SafeAreaView} from 'react-native-safe-area-context';
 import {StatusBar} from 'expo-status-bar';
@@ -86,4 +88,4 @@ function AppBody(){
  {screen==='presets'&&<><Text style={s.title}>Application guidance</Text><Text style={s.body}>Use the current recruitment notice and portal for final requirements.</Text>{presets.map((p:any)=><Card key={p.id}><Pressable onPress={()=>setPreset(preset?.id===p.id?null:p)}><Text style={s.h2}>{p.name} {preset?.id===p.id?'−':'+'}</Text></Pressable>{preset?.id===p.id&&<><Text style={s.body}>{p.disclaimer}</Text>{p.sourceUrl&&<Button title="View official source" secondary onPress={()=>Linking.openURL(p.sourceUrl).catch(e=>setError(friendlyError(e)))}/>}</>}</Card>)}</>}
  </ScrollView>}<AppNavigation active={activeTab} onSelect={selectTab}/></SafeAreaView>;
 }
-export default function App(){return <SafeAreaProvider><AppBody/></SafeAreaProvider>;}
+export default function App(){const [loaded,error]=useFonts({Montserrat_400Regular,Montserrat_500Medium,Montserrat_600SemiBold,Montserrat_700Bold,Montserrat_800ExtraBold,Montserrat_900Black});if(!loaded&&!error)return null;return <SafeAreaProvider><AppBody/></SafeAreaProvider>;}

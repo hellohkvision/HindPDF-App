@@ -1,5 +1,6 @@
+import {Text} from './AppText';
 import React,{useEffect,useRef} from 'react';
-import {Platform,Text} from 'react-native';
+import {Platform} from 'react-native';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import {GoogleAuthProvider,signInWithCredential} from 'firebase/auth';

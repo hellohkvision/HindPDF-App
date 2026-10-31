@@ -1,5 +1,6 @@
+import {Text} from './AppText';
 import React,{useEffect,useState} from 'react';
-import {Alert,Platform,Text} from 'react-native';
+import {Alert,Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RazorpayCheckout from 'react-native-razorpay';
 import type {User} from 'firebase/auth';

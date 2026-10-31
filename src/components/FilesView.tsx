@@ -1,5 +1,6 @@
+import {Text} from './AppText';
 import React,{useState} from 'react';
-import {Alert,Pressable,Text,View} from 'react-native';
+import {Alert,Pressable,View} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {Card,Chips,colors,s} from './ui';
 import {ToolIcon} from './Dashboard';
