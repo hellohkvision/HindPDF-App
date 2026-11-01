@@ -1,6 +1,7 @@
+import {ScrollView,Pressable,View,Ionicons} from '../theme/Themed';
 import React,{useRef,useState} from 'react';
-import {ScrollView,Pressable,StyleSheet,useWindowDimensions,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {StyleSheet, useWindowDimensions,type ScrollView as ScrollViewRef} from 'react-native';
+
 import {Text} from './AppText';
 import {colors,s} from './ui';
 const slides=[
@@ -9,7 +10,7 @@ const slides=[
  {id:'scan-to-pdf',title:'Scan documents on the go',subtitle:'Capture pages and create a PDF.',label:'Open scanner',icon:'camera-outline'}
 ] as const;
 export function PromoCarousel({onOpen}:{onOpen:(id:string)=>void}){
- const {width}=useWindowDimensions();const cardWidth=Math.max(220,width-40);const [current,setCurrent]=useState(0);const ref=useRef<ScrollView>(null);
+ const {width}=useWindowDimensions();const cardWidth=Math.max(220,width-40);const [current,setCurrent]=useState(0);const ref=useRef<ScrollViewRef>(null);
  return <View accessibilityLabel="Featured tools" style={{gap:8}}>
   <ScrollView ref={ref} horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={e=>setCurrent(Math.max(0,Math.min(slides.length-1,Math.round(e.nativeEvent.contentOffset.x/cardWidth))))}>
    {slides.map((item,i)=><Pressable key={item.id} accessibilityRole="button" accessibilityLabel={item.label} onPress={()=>onOpen(item.id)} style={({pressed})=>[styles.slide,{width:cardWidth,opacity:pressed ? 0.8 : 1}]}><View style={{flex:1,gap:6}}><Text style={styles.eyebrow}>DISCOVER HINDPDF</Text><Text style={styles.title}>{item.title}</Text><Text style={s.small}>{item.subtitle}</Text><Text style={styles.link}>{item.label}  →</Text></View><View style={styles.icon}><Ionicons name={item.icon} size={28} color={colors.primary}/></View></Pressable>)}

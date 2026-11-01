@@ -1,6 +1,7 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import React,{useState} from 'react';
-import {Platform,Pressable,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {Platform} from 'react-native';
+
 import type {User} from 'firebase/auth';
 import {Text} from './AppText';
 import {Checkout} from './Checkout';

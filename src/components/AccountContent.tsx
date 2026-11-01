@@ -1,7 +1,8 @@
+import {Pressable,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React from 'react';
-import {Pressable} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+
+
 import {Card,colors,s} from './ui';
 const links:[string,string,React.ComponentProps<typeof Ionicons>['name']][]=[
  ['Privacy policy','https://hindpdf.com/privacy','shield-checkmark-outline'],

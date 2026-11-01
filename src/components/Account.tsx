@@ -1,7 +1,8 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React,{useEffect,useState} from 'react';
-import {Alert,Pressable,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {Alert} from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
 import {EmailAuthProvider,reauthenticateWithCredential,sendEmailVerification,signOut,updatePassword,updateProfile,type User} from 'firebase/auth';

@@ -8,7 +8,7 @@ export function friendlyError(value:unknown):string {
  if(error?.status&&error.status>=500)return 'This service is temporarily unavailable. Please try again later.';
  if(/network|fetch|timeout|abort|internet/i.test(msg))return 'Check your internet connection and try again.';
  if(/password/i.test(msg)&&/wrong|incorrect|invalid/i.test(msg))return 'This password didn’t work. Please try again.';
- const safe=[/^Choose /,/^Please /,/^Enter /,/^Use page numbers/,/^Page numbers must/,/^Each page may/,/^Keep at least/,/^Add at least/,/^This tool is not yet/,/^For device processing/,/^Target size is too small/,/^Output is smaller/,/^Minimum size cannot/,/^Signature must fit/,/^Text position must/,/^Document engine is starting/,/^Another document is being/,/^This document took too long/,/^Camera permission is required/];
+ const safe=[/^Choose /,/^Please /,/^Enter /,/^Use page numbers/,/^Page numbers must/,/^Each page may/,/^Keep at least/,/^Add at least/,/^This tool is not yet/,/^This text font supports Latin characters/,/^The marked area must fit/,/^The image must fit/,/^For device processing/,/^Target size is too small/,/^Output is smaller/,/^Minimum size cannot/,/^Signature must fit/,/^Text position must/,/^Document engine is starting/,/^Another document is being/,/^This document took too long/,/^Camera permission is required/];
  if(!(value instanceof ApiError)&&safe.some(p=>p.test(msg))&&msg.length<180)return msg;
  return 'Something went wrong. Please try again.';
 }

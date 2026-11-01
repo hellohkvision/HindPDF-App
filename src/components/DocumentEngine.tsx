@@ -19,11 +19,13 @@ export const DocumentEngine=forwardRef<EngineHandle>(function DocumentEngine(_,r
   let total=0;for(const file of files){const info=await FileSystem.getInfoAsync(file.uri);if(!info.exists)throw Error('Please choose the file again.');total+=info.size||file.size;}
   if(total>35*1024*1024)throw Error('For device processing, choose files totalling less than 35 MB.');
   const encoded: (InputFile & {base64: string})[]=[];for(const file of files)encoded.push({...file,base64:await FileSystem.readAsStringAsync(file.uri,{encoding:FileSystem.EncodingType.Base64})});
+  const fontFile=options.fontFile?{...options.fontFile,base64:await FileSystem.readAsStringAsync(options.fontFile.uri,{encoding:FileSystem.EncodingType.Base64})}:undefined;
+  const imageFile=options.imageFile?{...options.imageFile,base64:await FileSystem.readAsStringAsync(options.imageFile.uri,{encoding:FileSystem.EncodingType.Base64})}:undefined;
   const signature=options.signature?{...options.signature,base64:await FileSystem.readAsStringAsync(options.signature.uri,{encoding:FileSystem.EncodingType.Base64})}:undefined;
   const id=Crypto.randomUUID();
   return new Promise<OutputFile>((resolve,reject)=>{
    pending.current={id,resolve,reject,progress:onProgress,tool,scanName:options.scanName,timer:setTimeout(()=>{fail('This document took too long. Try fewer pages.');readyRef.current=false;view.current?.reload();setReady(false);},300000)};
-   const request=JSON.stringify({id,tool,files:encoded,options:{...options,signature,ownerPassword:Crypto.randomUUID()}}).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
+   const request=JSON.stringify({id,tool,files:encoded,options:{...options,fontFile,imageFile,signature,ownerPassword:Crypto.randomUUID()}}).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
    view.current?.injectJavaScript(`window.hindRun(${request});true;`);
   });
  }}),[ready]);

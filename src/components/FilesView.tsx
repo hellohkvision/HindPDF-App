@@ -1,7 +1,8 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React,{useEffect,useState} from 'react';
-import {Alert,Pressable,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {Alert} from 'react-native';
+
 import {Card,Chips,Field,colors,s} from './ui';
 import {ToolIcon} from './Dashboard';
 import type {OutputFile,ScanDraft} from '../types';

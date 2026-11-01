@@ -1,7 +1,8 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React from 'react';
-import {Pressable,StyleSheet,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {StyleSheet} from 'react-native';
+
 import {colors,s} from './ui';
 import type {OutputFile,Tool} from '../types';
 const icons:Record<string,React.ComponentProps<typeof Ionicons>['name']>={

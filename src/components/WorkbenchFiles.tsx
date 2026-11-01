@@ -1,7 +1,8 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React,{useState} from 'react';
-import {Pressable,View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+
+
 import {colors,s} from './ui';
 import type {InputFile,Tool} from '../types';
 export function WorkbenchFiles({tool,files,error,onChoose,onRemove,onMove}:{tool:Tool;files:InputFile[];error:string;onChoose:()=>void;onRemove:(i:number)=>void;onMove:(i:number,direction:-1|1)=>void}){

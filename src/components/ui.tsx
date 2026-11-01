@@ -1,7 +1,8 @@
+import {Pressable,TextInput,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React from 'react';
-import {ActivityIndicator,Pressable,StyleSheet,TextInput,View,type TextInputProps} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {ActivityIndicator, StyleSheet, type TextInputProps} from 'react-native';
+
 export const colors={ink:'#0b1220',muted:'#60708a',primary:'#e91d48',bg:'#ffffff',line:'#dfe6ef',white:'#ffffff',blue:'#164f79'};
 export function Button({title,onPress,secondary=false,disabled=false,busy=false}:{title:string;onPress:()=>void;secondary?:boolean;disabled?:boolean;busy?:boolean}){const [hovered,setHovered]=React.useState(false);const [focused,setFocused]=React.useState(false);return <Pressable onHoverIn={()=>setHovered(true)} onHoverOut={()=>setHovered(false)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} accessibilityRole="button" accessibilityLabel={title} disabled={disabled||busy} onPress={onPress} accessibilityState={{disabled:disabled||busy,busy}} style={({pressed})=>[s.button,secondary&&s.secondary,(disabled||busy)&&{opacity:.45},(pressed||hovered)&&{opacity:.82},focused&&{borderWidth:2,borderColor:colors.blue}]}>{busy?<ActivityIndicator color={secondary?colors.ink:'white'}/>:<Text style={[s.buttonText,secondary&&{color:colors.ink}]}>{title}</Text>}</Pressable>;}
 export function Field({label,...props}:TextInputProps&{label:string}){return <View style={{gap:7,marginBottom:12}}><Text style={s.label}>{label}</Text><TextInput accessibilityLabel={label} placeholderTextColor="#8795a4" {...props} style={[s.input,props.multiline&&{minHeight:90,textAlignVertical:'top'},props.style]}/></View>;}

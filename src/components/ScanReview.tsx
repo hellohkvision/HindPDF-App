@@ -1,9 +1,10 @@
+import {Pressable,ScrollView,View,Ionicons} from '../theme/Themed';
 import React,{useEffect,useRef,useState} from 'react';
-import {ActivityIndicator,Alert,Image,Modal,PanResponder,Pressable,ScrollView,StyleSheet,View} from 'react-native';
+import {ActivityIndicator, Alert, Image, Modal, PanResponder, StyleSheet} from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Sharing from 'expo-sharing';
 import Svg,{Polygon} from 'react-native-svg';
-import {Ionicons} from '@expo/vector-icons';
+
 import {Text} from './AppText';
 import {SignaturePad} from './SignaturePad';
 import {Button,Chips,Field,colors,s} from './ui';

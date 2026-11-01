@@ -1,7 +1,8 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import {StyleSheet} from 'react-native';
+
 import {colors} from './ui';
 export type Tab = 'home' | 'tools' | 'scan' | 'files' | 'account';
 const tabs: {id:Tab; label:string; icon:React.ComponentProps<typeof Ionicons>['name']}[]=[

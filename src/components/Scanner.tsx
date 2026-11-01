@@ -1,11 +1,12 @@
+import {Pressable,View,Ionicons} from '../theme/Themed';
 import {Text} from './AppText';
 import React,{useState} from 'react';
-import {Linking,Pressable,StyleSheet,View} from 'react-native';
+import {Linking, StyleSheet} from 'react-native';
 import {CameraView,useCameraPermissions} from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import DocumentScanner from 'react-native-document-scanner-plugin';
-import {Ionicons} from '@expo/vector-icons';
+
 import type {InputFile} from '../types';
 import {Button,colors,s} from './ui';
 export function Scanner({files,onAdd,onReview,onError,retaking=false}:{retaking?:boolean;files:InputFile[];onAdd:(f:InputFile)=>void;onReview:(detect?:boolean)=>void;onError:(message:string)=>void}){
