@@ -88,6 +88,33 @@
     ]
   },
   {
+    "id": "passport-photo",
+    "slug": "passport-photo",
+    "catKey": "core",
+    "persona": [
+      "students",
+      "business"
+    ],
+    "name": "Passport Size Photo",
+    "tier": "free",
+    "desc": "Crop and resize a photo to common passport photo dimensions.",
+    "color": "#e91d48",
+    "prefix": "Passport_photo_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true,
+    "keywords": [
+      "passport size",
+      "passport photo",
+      "id photo",
+      "visa photo"
+    ]
+  },
+  {
     "id": "photo-resizer",
     "slug": "photo-resizer",
     "catKey": "core",

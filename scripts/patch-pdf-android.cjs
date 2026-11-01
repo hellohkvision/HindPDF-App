@@ -15,6 +15,30 @@ view=replace(view,'    private float lastPageHeight = 0;',`    private float las
     private boolean requestedPageChange = false;
     private boolean requestedScaleChange = false;
     private float lastReportedZoom = 1f;`,'state');
+view=replace(view,'import android.view.MotionEvent;','import android.view.MotionEvent;\nimport android.view.GestureDetector;','selection gesture import');
+view=replace(view,'    private float lastReportedZoom = 1f;',`    private float lastReportedZoom = 1f;
+    private GestureDetector hindPdfSelectionGesture;`,'selection gesture state');
+view=replace(view,'        super(context, set);',`        super(context, set);
+        hindPdfSelectionGesture = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+            @Override public boolean onDown(MotionEvent event) { return true; }
+            @Override public void onLongPress(MotionEvent event) {
+                WritableMap selectionEvent = Arguments.createMap();
+                selectionEvent.putString("message", "pageLongPress|" + page);
+                ThemedReactContext reactContext = (ThemedReactContext) getContext();
+                EventDispatcher dispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, getId());
+                if (dispatcher != null) dispatcher.dispatchEvent(new TopChangeEvent(UIManagerHelper.getSurfaceId(PdfView.this), getId(), selectionEvent));
+            }
+        });`,'selection gesture setup');
+view=replace(view,'    public void onPageChanged(int page, int numberOfPages) {',`    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (hindPdfSelectionGesture != null) hindPdfSelectionGesture.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void onPageChanged(int page, int numberOfPages) {`,'selection gesture dispatch');
+index=replace(index,"            } else if (message[0] === 'pageSingleTap') {",`            } else if (message[0] === 'pageLongPress') {
+                this.props.onPageLongPress && this.props.onPageLongPress(Number(message[1]));
+            } else if (message[0] === 'pageSingleTap') {`,'selection gesture bridge');
 if(!view.includes('public void applyPendingUpdates()'))view=replace(view,'    public void drawPdf() {',`    // The upstream manager reloads the whole document for every native prop update.
     // Only configuration changes need a reload; page and zoom use the live PDFView.
     public void applyPendingUpdates() {

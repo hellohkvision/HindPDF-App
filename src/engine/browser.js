@@ -8,6 +8,8 @@ import {jsPDF} from 'jspdf';
 import JSZip from 'jszip';
 import {pageIndices,positive} from './ranges.cjs';
 import {pixels} from '../utils/dimensions.cjs';
+import {imageCrop,outputSize} from '../utils/image-crop.cjs';
+import {jpegWithDensity} from '../utils/jpeg-density.cjs';
 import {applyScanFilter} from './scan-filters.cjs';
 import {scanLayout} from './scan-layout.cjs';
 import {detectPage} from './scan-detect.cjs';
@@ -48,19 +50,18 @@ async function raster(file, o, progress, kind) {
  } finally {await source.destroy();}
 }
 async function resized(file,o) {
- const img=await image(file);let w=pixels(o.width,o.unit||'px',o.dpi===undefined?'300':o.dpi)||img.width,h=pixels(o.height,o.unit||'px',o.dpi===undefined?'300':o.dpi)||img.height;
- if(o.width&&!o.height)h=Math.max(1,Math.round(img.height*w/img.width));
- if(o.height&&!o.width)w=Math.max(1,Math.round(img.width*h/img.height));
- const c=canvas(w,h),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+ const img=await image(file),width=pixels(o.width,o.unit||'px',o.dpi===undefined?'300':o.dpi),height=pixels(o.height,o.unit||'px',o.dpi===undefined?'300':o.dpi),{width:w,height:h}=outputSize(img.width,img.height,width,height),crop=imageCrop(img.width,img.height,w,h,o.imageCrop);
+ const c=canvas(w,h),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.drawImage(img,crop.x,crop.y,crop.width,crop.height,0,0,w,h);
  const target=o.targetKB?positive(o.targetKB,undefined,100000)*1024:Infinity;
  const min=o.minKB?positive(o.minKB,0,100000)*1024:0;
  if(min>target)throw Error('Minimum size cannot exceed maximum size.');
- let best=c.toDataURL('image/jpeg',.95).split(',')[1];
- if(bytes(best).length>target){let lo=.02,hi=.95;best='';for(let i=0;i<12;i++){const q=(lo+hi)/2,b=c.toDataURL('image/jpeg',q).split(',')[1];if(bytes(b).length<=target){best=b;lo=q;}else hi=q;}}
+ const dpi=Number(o.dpi);const resolution=Number.isFinite(dpi)&&dpi>=36&&dpi<=1200?dpi:300,encode=q=>jpegWithDensity(bytes(c.toDataURL('image/jpeg',q).split(',')[1]),resolution);
+ let best=encode(.95);
+ if(best.length>target){let lo=.02,hi=.95;best=null;for(let i=0;i<12;i++){const q=(lo+hi)/2,b=encode(q);if(b.length<=target){best=b;lo=q;}else hi=q;}}
  cleanCanvas(c);
  if(!best)throw Error('Target size is too small for these dimensions. Reduce width and height.');
- const result=bytes(best);if(result.length<min)throw Error('Output is smaller than the required minimum. Increase dimensions or choose a higher resolution original.');
- return result;
+ if(best.length<min)throw Error('Output is smaller than the required minimum. Increase dimensions or choose a higher resolution original.');
+ return best;
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
@@ -93,10 +94,10 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
   if(id==='protect-password'&&(!o.password||o.password.length<8||o.password!==o.confirmPassword))throw Error('Use a password of at least 8 characters and confirm it.');
   return raster(files[0],{...o,format:id==='pdf-to-png'?'png':id==='pdf-to-jpg'?'jpg':o.format},progress,id.startsWith('pdf-to-')?'images':id==='protect-password'?'protect':'pdf');
  }
- if(['photo-resizer','photo-compressor','signature-resizer','thumb-impression-resizer','declaration-optimizer'].includes(id))return {data:await resized(files[0],o),ext:'.jpg',mime:'image/jpeg'};
+ if(['photo-resizer','passport-photo','photo-compressor','signature-resizer','thumb-impression-resizer','declaration-optimizer'].includes(id))return {data:await resized(files[0],o),ext:'.jpg',mime:'image/jpeg'};
  if(id==='photo-signature-prep') {
   if(files.length!==2)throw Error('Choose the photo first and signature second.');
-  const z=new JSZip();z.file('photo.jpg',await resized(files[0],{...o,width:o.photoWidth,height:o.photoHeight,targetKB:o.photoKB,minKB:''}));z.file('signature.jpg',await resized(files[1],o));
+  const z=new JSZip();z.file('photo.jpg',await resized(files[0],{...o,width:o.photoWidth,height:o.photoHeight,targetKB:o.photoKB,minKB:'',imageCrop:o.photoCrop}));z.file('signature.jpg',await resized(files[1],{...o,imageCrop:o.signatureCrop}));
   return {data:await z.generateAsync({type:'uint8array'}),ext:'.zip',mime:'application/zip'};
  }
  const output=await PDFDocument.create();

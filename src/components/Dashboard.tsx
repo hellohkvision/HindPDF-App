@@ -8,7 +8,7 @@ import type {OutputFile,Tool} from '../types';
 const icons:Record<string,React.ComponentProps<typeof Ionicons>['name']>={
  merge:'copy-outline', split:'cut-outline', compress:'contract-outline',
  'pdf-to-jpg':'image-outline','jpg-to-pdf':'images-outline','pdf-to-png':'image-outline','png-to-pdf':'images-outline','image-to-pdf':'images-outline',
- 'photo-resizer':'resize-outline','photo-compressor':'contract-outline','signature-resizer':'create-outline','thumb-impression-resizer':'finger-print-outline',
+ 'passport-photo':'person-outline','photo-resizer':'resize-outline','photo-compressor':'contract-outline','signature-resizer':'create-outline','thumb-impression-resizer':'finger-print-outline',
  'declaration-optimizer':'document-text-outline','photo-signature-prep':'people-outline','pdf-to-image':'images-outline',
  'word-to-pdf':'document-text-outline','pdf-to-word':'document-text-outline','excel-to-pdf':'grid-outline','pdf-to-excel':'grid-outline',
  'ppt-to-pdf':'easel-outline','pdf-to-ppt':'easel-outline',rotate:'refresh-outline','delete-pages':'trash-outline',
@@ -21,7 +21,7 @@ const unavailable=new Set(['protect-password','html-to-pdf','repair-pdf']);
 const palettes:Record<string,{ink:string;bg:string}>={red:{ink:'#db3440',bg:'#fff0f1'},blue:{ink:'#2868b6',bg:'#e9f2ff'},green:{ink:'#168261',bg:'#e7f6ef'},purple:{ink:'#7950bc',bg:'#f1eafd'},orange:{ink:'#c65a1b',bg:'#fff0e4'},teal:{ink:'#087f8c',bg:'#e5f7f8'}};
 const iconColor:Record<string,string>={
  merge:'red',split:'orange',compress:'green','pdf-to-jpg':'purple','jpg-to-pdf':'purple','pdf-to-png':'teal','png-to-pdf':'teal','image-to-pdf':'purple',
- 'photo-resizer':'orange','photo-compressor':'orange','signature-resizer':'teal','thumb-impression-resizer':'teal','declaration-optimizer':'orange','photo-signature-prep':'purple','pdf-to-image':'purple',
+ 'passport-photo':'red','photo-resizer':'orange','photo-compressor':'orange','signature-resizer':'teal','thumb-impression-resizer':'teal','declaration-optimizer':'orange','photo-signature-prep':'purple','pdf-to-image':'purple',
  'word-to-pdf':'blue','pdf-to-word':'blue','excel-to-pdf':'green','pdf-to-excel':'green','ppt-to-pdf':'orange','pdf-to-ppt':'orange',
  rotate:'blue','delete-pages':'red','extract-pages':'teal','reorder-pages':'purple','page-numbers':'blue','crop-pdf':'orange','edit-pdf':'blue','add-text':'purple','add-watermark':'purple',
  'protect-password':'orange',unlock:'green',sign:'red',redact:'red','scan-to-pdf':'teal',ocr:'purple','pdf-reader':'blue','repair-pdf':'orange','html-to-pdf':'blue'
