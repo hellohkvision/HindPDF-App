@@ -35,8 +35,10 @@ export async function api(path: string, body?: unknown, authenticated = true): P
 export function outputUri(name: string) { return FileSystem.documentDirectory + 'outputs/' + Date.now() + '-' + name.replace(/[^a-zA-Z0-9_.-]/g,'_'); }
 export async function prepareOutputDirectory() { await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory+'outputs/',{intermediates:true}); }
 export async function convertOnServer(tool: Tool, file: InputFile, options: ToolOptions): Promise<OutputFile> {
-  const authHeaders = await authenticatedHeaders();
-  if(auth.currentUser?.isAnonymous)await api('/api/usage/guest-check');
+  await auth.authStateReady();
+  const current=auth.currentUser,requiresAccount=['excel-to-pdf','ocr'].includes(tool.id);
+  if(requiresAccount&&(!current||current.isAnonymous))throw new ApiError('Please log in to use this online tool.','AUTH_REQUIRED',401);
+  const authHeaders:Record<string,string>=current&&!current.isAnonymous?{Authorization:`Bearer ${await current.getIdToken()}`} : {};
   const name = 'HindPDF_'+tool.id+tool.ext;
   await prepareOutputDirectory(); const destination = outputUri(name);
   const parameters: Record<string,string> = {};

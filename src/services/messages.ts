@@ -1,9 +1,12 @@
 import {ApiError} from './api';
 export function friendlyError(value:unknown):string {
  const error=value as {code?:string;status?:number;message?:string}; const msg=String(error?.message||'');
- if(error?.code==='GUEST_UNAVAILABLE')return 'Guest access is temporarily unavailable. Please try again later or sign in.';
+ if(error?.code==='GUEST_UNAVAILABLE')return 'Guest tool access is temporarily unavailable on the server. Please try again later or log in.';
+ if(error?.code==='auth/operation-not-allowed')return 'Guest tool access is not enabled on the server. Please log in or try again later.';
+ if(error?.code==='EMAIL_NOT_VERIFIED')return 'Please verify your email before using tools.';
  if(error?.code==='AUTH_REQUIRED')return 'Please sign in to continue.';
- if(error?.code==='FREE_QUOTA_EXCEEDED')return "You've reached today's free limit. Try again later or view available plans.";
+ if(error?.code==='FREE_QUOTA_EXCEEDED')return "You've reached today's device limit of 5 uses. Try again tomorrow.";
+ if(error?.code==='QUOTA_STORAGE_ERROR')return 'Could not verify the daily limit on this device. Please try again.';
  if(error?.status===401||error?.status===403)return 'Please sign in again to continue.';
  if(error?.status&&error.status>=500)return 'This service is temporarily unavailable. Please try again later.';
  if(/network|fetch|timeout|abort|internet/i.test(msg))return 'Check your internet connection and try again.';

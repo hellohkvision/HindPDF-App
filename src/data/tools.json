@@ -470,7 +470,7 @@
     "accept": ".pdf",
     "multiple": false,
     "location": "device",
-    "available": true
+    "available": false
   },
   {
     "id": "unlock",
@@ -612,7 +612,7 @@
     "accept": ".pdf",
     "multiple": false,
     "location": "device",
-    "available": true
+    "available": false
   },
   {
     "id": "html-to-pdf",
@@ -632,6 +632,6 @@
     "accept": ".html,.htm,text/html",
     "multiple": false,
     "location": "device",
-    "available": true
+    "available": false
   }
 ]

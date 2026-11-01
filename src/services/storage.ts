@@ -7,6 +7,7 @@ import type {OutputFile} from '../types';
 const key='hindpdf.mobile.history';
 export async function history():Promise<OutputFile[]>{try{return JSON.parse(await AsyncStorage.getItem(key)||'[]');}catch{return [];}}
 export async function record(output:OutputFile){const previous=await history();await AsyncStorage.setItem(key,JSON.stringify([output,...previous].slice(0,200)));}
+export async function recordExternal(output:OutputFile,sourceUri:string){const previous=await history(),replaced=previous.filter(f=>f.sourceUri===sourceUri);await AsyncStorage.setItem(key,JSON.stringify([{...output,sourceUri},...previous.filter(f=>f.sourceUri!==sourceUri)].slice(0,200)));const owned=FileSystem.documentDirectory+'outputs/';for(const f of replaced)if(f.uri!==output.uri&&f.uri.startsWith(owned))await FileSystem.deleteAsync(f.uri,{idempotent:true}).catch(()=>{});}
 export async function remove(output:OutputFile){await FileSystem.deleteAsync(output.uri,{idempotent:true});await AsyncStorage.setItem(key,JSON.stringify((await history()).filter(f=>f.uri!==output.uri)));}
 export async function clearDocuments(){for(const f of await history())await FileSystem.deleteAsync(f.uri,{idempotent:true});await AsyncStorage.removeItem(key);await clearScanDrafts();}
 export async function share(output:OutputFile){if(!await Sharing.isAvailableAsync())throw Error('Sharing is unavailable on this device.');await Sharing.shareAsync(output.uri,{mimeType:output.mime,dialogTitle:output.name,UTI:output.mime==='application/pdf'?'com.adobe.pdf':undefined});}

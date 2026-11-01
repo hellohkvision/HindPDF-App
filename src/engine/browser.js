@@ -65,6 +65,10 @@ async function resized(file,o) {
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
  if(id==='pdf-search')return searchAndHighlight(bytes(files[0].base64),o.text,{pdfjs,PDFDocument,rgb,degrees},progress);
+ if(id==='pdf-extract-text'){
+  const doc=await pdfjs.getDocument({data:bytes(files[0].base64),isEvalSupported:false,useSystemFonts:true}).promise;
+  try{const permissions=await doc.getPermissions();if(permissions&&!permissions.includes(pdfjs.PermissionFlag.COPY))throw Error('Copying text is restricted in this PDF.');const number=Number(o.pages);if(!Number.isInteger(number)||number<1||number>doc.numPages)throw Error('Choose a valid PDF page.');const page=await doc.getPage(number);try{const content=await page.getTextContent();const text=content.items.map(item=>('str' in item?item.str:'')+(item.hasEOL?'\n':'')).join('');return {data:new TextEncoder().encode(text),ext:'.txt',mime:'text/plain'};}finally{page.cleanup();}}finally{await doc.destroy();}
+ }
  if(id==='scan-crop') {
   const img=await image(files[0]),points=o.cropPoints,t=projectiveCoefficients(points),dist=(a,b)=>Math.hypot((a.x-b.x)*img.width,(a.y-b.y)*img.height),w=Math.max(1,Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2])))),h=Math.max(1,Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2]))));
   const source=canvas(img.width,img.height),sx=source.getContext('2d');sx.drawImage(img,0,0);const input=sx.getImageData(0,0,img.width,img.height).data,out=canvas(w,h),ctx=out.getContext('2d'),pixels=ctx.createImageData(w,h),d=pixels.data;

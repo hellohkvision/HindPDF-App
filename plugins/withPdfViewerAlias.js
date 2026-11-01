@@ -17,17 +17,28 @@ module.exports=function withPdfViewerAlias(config){
  return withMainActivity(config,mod=>{
   if(mod.modResults.language!=='kt')throw new Error('PDF editor intent routing requires Kotlin MainActivity.');
   let source=mod.modResults.contents;
-  if(!source.includes('// HindPDF editor intent routing')){
-   const start='class MainActivity : ReactActivity() {';
-   if(!source.includes(start)||!source.includes('super.onCreate(null)'))throw new Error('Could not install PDF editor intent routing.');
-   source=source.replace(start,`${start}
-  // HindPDF editor intent routing
+  const start='class MainActivity : ReactActivity() {';
+  const routing=`  // HindPDF editor intent routing
   private fun preparePdfIntent(incoming: android.content.Intent?) {
-    if (incoming?.component?.className?.endsWith(".PdfEditorActivity") == true && incoming.data != null) {
-      val original = incoming.data.toString()
-      incoming.data = android.net.Uri.parse("hindpdf://edit-pdf?uri=" + android.net.Uri.encode(original))
-      incoming.action = android.content.Intent.ACTION_VIEW
+    val component = incoming?.component?.className ?: return
+    val mode = when {
+      component.endsWith(".PdfEditorActivity") -> "editor"
+      component.endsWith(".PdfViewerActivity") -> "viewer"
+      else -> return
     }
+    val original = incoming.data ?: return
+    if (original.scheme != "content" && original.scheme != "file") return
+    var displayName: String? = null
+    try {
+      if (original.scheme == "content") contentResolver.query(original, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) displayName = cursor.getString(0)
+      }
+      if (displayName.isNullOrBlank()) displayName = original.lastPathSegment
+    } catch (_: Exception) { }
+    incoming.data = android.net.Uri.Builder().scheme("hindpdf").authority("external-pdf")
+      .appendQueryParameter("uri", original.toString()).appendQueryParameter("mode", mode)
+      .appendQueryParameter("name", displayName ?: "Document.pdf").build()
+    incoming.action = android.content.Intent.ACTION_VIEW
   }
 
   override fun onNewIntent(intent: android.content.Intent) {
@@ -35,9 +46,11 @@ module.exports=function withPdfViewerAlias(config){
     setIntent(intent)
     super.onNewIntent(intent)
   }
-`);
-   source=source.replace('super.onCreate(null)','preparePdfIntent(intent)\n    super.onCreate(null)');
-  }
+`;
+  const pattern=/  \/\/ HindPDF editor intent routing[\s\S]*?(?=  override fun onCreate\()/;
+  if(pattern.test(source))source=source.replace(pattern,routing+'\n');
+  else {if(!source.includes(start)||!source.includes('super.onCreate(null)'))throw new Error('Could not install PDF editor intent routing.');source=source.replace(start,start+'\n'+routing);}
+  if(!source.includes('preparePdfIntent(intent)\n    super.onCreate(null)'))source=source.replace('super.onCreate(null)','preparePdfIntent(intent)\n    super.onCreate(null)');
   mod.modResults.contents=source;return mod;
  });
 };
