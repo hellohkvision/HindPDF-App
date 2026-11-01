@@ -32,7 +32,7 @@ class HindPdfStorageModule(private val appContext: ReactApplicationContext) : Re
         val pkg = appContext.packageName
         chooser.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(pkg, "$pkg.PdfViewerActivity"), ComponentName(pkg, "$pkg.PdfEditorActivity"), ComponentName(pkg, "$pkg.MainActivity")))
       }
-      val activity = currentActivity
+      val activity = appContext.currentActivity
       if (activity != null) activity.startActivity(chooser) else { chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); appContext.startActivity(chooser) }
       promise.resolve(null)
     } catch (error: Exception) { promise.reject("HINDPDF_OPEN_WITH_FAILED", "Could not open the PDF in another app.", error) }
