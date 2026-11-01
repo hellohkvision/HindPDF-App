@@ -10,10 +10,10 @@ import {pageIndices,positive} from './ranges.cjs';
 import {pixels} from '../utils/dimensions.cjs';
 import {imageCrop,outputSize} from '../utils/image-crop.cjs';
 import {jpegWithDensity} from '../utils/jpeg-density.cjs';
-import {applyScanFilter} from './scan-filters.cjs';
+import {applyScanFilterAsync} from './scan-filters.cjs';
 import {scanLayout} from './scan-layout.cjs';
 import {detectPage} from './scan-detect.cjs';
-import {projectiveCoefficients,mapPoint} from './perspective.cjs';
+import {projectiveCoefficients} from './perspective.cjs';
 import {searchAndHighlight} from './pdf-highlights.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
@@ -49,14 +49,14 @@ async function raster(file, o, progress, kind) {
   return kind==='images'?{data:await zip.generateAsync({type:'uint8array'}),ext:'.zip',mime:'application/zip'}:{data:new Uint8Array(pdf.output('arraybuffer')),ext:'.pdf',mime:'application/pdf'};
  } finally {await source.destroy();}
 }
-async function resized(file,o) {
+async function resized(file,o,quality=.95) {
  const img=await image(file),width=pixels(o.width,o.unit||'px',o.dpi===undefined?'300':o.dpi),height=pixels(o.height,o.unit||'px',o.dpi===undefined?'300':o.dpi),{width:w,height:h}=outputSize(img.width,img.height,width,height),crop=imageCrop(img.width,img.height,w,h,o.imageCrop);
  const c=canvas(w,h),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.drawImage(img,crop.x,crop.y,crop.width,crop.height,0,0,w,h);
  const target=o.targetKB?positive(o.targetKB,undefined,100000)*1024:Infinity;
  const min=o.minKB?positive(o.minKB,0,100000)*1024:0;
  if(min>target)throw Error('Minimum size cannot exceed maximum size.');
  const dpi=Number(o.dpi);const resolution=Number.isFinite(dpi)&&dpi>=36&&dpi<=1200?dpi:300,encode=q=>jpegWithDensity(bytes(c.toDataURL('image/jpeg',q).split(',')[1]),resolution);
- let best=encode(.95);
+ let best=encode(quality);
  if(best.length>target){let lo=.02,hi=.95;best=null;for(let i=0;i<12;i++){const q=(lo+hi)/2,b=encode(q);if(b.length<=target){best=b;lo=q;}else hi=q;}}
  cleanCanvas(c);
  if(!best)throw Error('Target size is too small for these dimensions. Reduce width and height.');
@@ -71,10 +71,29 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
   try{const permissions=await doc.getPermissions();if(permissions&&!permissions.includes(pdfjs.PermissionFlag.COPY))throw Error('Copying text is restricted in this PDF.');const number=Number(o.pages);if(!Number.isInteger(number)||number<1||number>doc.numPages)throw Error('Choose a valid PDF page.');const page=await doc.getPage(number);try{const content=await page.getTextContent();const text=content.items.map(item=>('str' in item?item.str:'')+(item.hasEOL?'\n':'')).join('');return {data:new TextEncoder().encode(text),ext:'.txt',mime:'text/plain'};}finally{page.cleanup();}}finally{await doc.destroy();}
  }
  if(id==='scan-crop') {
-  const img=await image(files[0]),points=o.cropPoints,t=projectiveCoefficients(points),dist=(a,b)=>Math.hypot((a.x-b.x)*img.width,(a.y-b.y)*img.height),w=Math.max(1,Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2])))),h=Math.max(1,Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2]))));
-  const source=canvas(img.width,img.height),sx=source.getContext('2d');sx.drawImage(img,0,0);const input=sx.getImageData(0,0,img.width,img.height).data,out=canvas(w,h),ctx=out.getContext('2d'),pixels=ctx.createImageData(w,h),d=pixels.data;
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const p=mapPoint(t,w===1?0:x/(w-1),h===1?0:y/(h-1)),px=Math.max(0,Math.min(img.width-1,p.x*(img.width-1))),py=Math.max(0,Math.min(img.height-1,p.y*(img.height-1))),x0=Math.floor(px),y0=Math.floor(py),x1=Math.min(img.width-1,x0+1),y1=Math.min(img.height-1,y0+1),fx=px-x0,fy=py-y0,di=(y*w+x)*4;for(let k=0;k<4;k++){const a=input[(y0*img.width+x0)*4+k]*(1-fx)+input[(y0*img.width+x1)*4+k]*fx,b=input[(y1*img.width+x0)*4+k]*(1-fx)+input[(y1*img.width+x1)*4+k]*fx;d[di+k]=a*(1-fy)+b*fy;}}
-  ctx.putImageData(pixels,0,0);const result=bytes(out.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(source);cleanCanvas(out);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+  const img=await image(files[0]),points=o.cropPoints,t=projectiveCoefficients(points);
+  // Bound the decoded canvas and output while keeping the chosen crop and its aspect ratio.
+  const limit=16000000,sourceScale=Math.min(1,Math.sqrt(limit/(img.width*img.height))),sourceWidth=Math.max(1,Math.floor(img.width*sourceScale)),sourceHeight=Math.max(1,Math.floor(img.height*sourceScale));
+  const dist=(a,b)=>Math.hypot((a.x-b.x)*sourceWidth,(a.y-b.y)*sourceHeight);
+  let w=Math.max(1,Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2])))),h=Math.max(1,Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2]))));
+  const outputScale=Math.min(1,Math.sqrt(limit/(w*h)));w=Math.max(1,Math.floor(w*outputScale));h=Math.max(1,Math.floor(h*outputScale));
+  let source,out;
+  try {
+   source=canvas(sourceWidth,sourceHeight);const sx=source.getContext('2d');sx.drawImage(img,0,0,sourceWidth,sourceHeight);
+   const input=sx.getImageData(0,0,sourceWidth,sourceHeight).data;cleanCanvas(source);source=null;
+   out=canvas(w,h);const ctx=out.getContext('2d'),rowsPerBand=Math.max(1,Math.min(64,Math.floor(262144/w)));
+   for(let first=0;first<h;first+=rowsPerBand){
+    const rows=Math.min(rowsPerBand,h-first),pixels=ctx.createImageData(w,rows),d=pixels.data;
+    for(let row=0;row<rows;row++){const y=first+row,v=h===1?0:y/(h-1);for(let x=0;x<w;x++){
+     // Equivalent to mapPoint, without allocating a temporary object for every pixel.
+     const u=w===1?0:x/(w-1),z=t.g*u+t.h*v+1,px=Math.max(0,Math.min(sourceWidth-1,((t.a*u+t.b*v+t.c)/z)*(sourceWidth-1))),py=Math.max(0,Math.min(sourceHeight-1,((t.d*u+t.e*v+t.f)/z)*(sourceHeight-1))),x0=Math.floor(px),y0=Math.floor(py),x1=Math.min(sourceWidth-1,x0+1),y1=Math.min(sourceHeight-1,y0+1),fx=px-x0,fy=py-y0,di=(row*w+x)*4;
+     for(let k=0;k<4;k++){const a=input[(y0*sourceWidth+x0)*4+k]*(1-fx)+input[(y0*sourceWidth+x1)*4+k]*fx,b=input[(y1*sourceWidth+x0)*4+k]*(1-fx)+input[(y1*sourceWidth+x1)*4+k]*fx;d[di+k]=a*(1-fy)+b*fy;}
+    }}
+    ctx.putImageData(pixels,0,first);
+    if(first+rows<h)await new Promise(resolve=>setTimeout(resolve,0));
+   }
+   const result=bytes(out.toDataURL('image/jpeg',.93).split(',')[1]);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+  } finally {if(source)cleanCanvas(source);if(out)cleanCanvas(out);}
  }
  if(id==='scan-detect') {
   const img=await image(files[0]),scale=Math.min(1,800/Math.max(img.width,img.height)),c=canvas(Math.max(1,Math.round(img.width*scale)),Math.max(1,Math.round(img.height*scale))),ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);const result=detectPage(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height);cleanCanvas(c);if(!result)throw Error('Page edges are unclear. Adjust the crop manually.');return {data:new TextEncoder().encode(JSON.stringify(result)),ext:'.json',mime:'application/json'};
@@ -83,18 +102,18 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
   const img=await image(files[0]),c=canvas(img.width,img.height),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);ctx.save();ctx.translate(c.width*.62,c.height*.8);const signatureScale=Math.min(c.width*.32/300,c.height*.16/130);ctx.scale(signatureScale,signatureScale);ctx.strokeStyle='#14263b';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';for(const path of o.signaturePaths||[])ctx.stroke(new Path2D(path));ctx.restore();const result=bytes(c.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(c);return {data:result,ext:'.jpg',mime:'image/jpeg'};
  }
  if(id==='scan-enhance') {
-  const img=await image(files[0]),c=canvas(img.width,img.height),ctx=c.getContext('2d');
-  ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0);
-  const pixels=ctx.getImageData(0,0,c.width,c.height),d=pixels.data;
-  applyScanFilter(d,o.preset);
-  ctx.putImageData(pixels,0,0);const result=bytes(c.toDataURL('image/jpeg',.93).split(',')[1]);cleanCanvas(c);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+  const img=await image(files[0]),scale=Math.min(1,Math.sqrt(16000000/(img.width*img.height))),w=Math.max(1,Math.floor(img.width*scale)),h=Math.max(1,Math.floor(img.height*scale)),c=canvas(w,h);
+  try {const ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+   const pixels=ctx.getImageData(0,0,w,h);await applyScanFilterAsync(pixels.data,o.preset,w,h);
+   ctx.putImageData(pixels,0,0);const result=bytes(c.toDataURL('image/jpeg',.93).split(',')[1]);return {data:result,ext:'.jpg',mime:'image/jpeg'};
+  } finally {cleanCanvas(c);}
  }
  if(id==='pdf-to-ppt'||id==='redact')throw Error('This tool is unavailable on HindPDF.');
  if(['pdf-to-jpg','pdf-to-png','pdf-to-image','unlock','protect-password','repair-pdf'].includes(id)) {
   if(id==='protect-password'&&(!o.password||o.password.length<8||o.password!==o.confirmPassword))throw Error('Use a password of at least 8 characters and confirm it.');
   return raster(files[0],{...o,format:id==='pdf-to-png'?'png':id==='pdf-to-jpg'?'jpg':o.format},progress,id.startsWith('pdf-to-')?'images':id==='protect-password'?'protect':'pdf');
  }
- if(['photo-resizer','passport-photo','photo-compressor','signature-resizer','thumb-impression-resizer','declaration-optimizer'].includes(id))return {data:await resized(files[0],o),ext:'.jpg',mime:'image/jpeg'};
+ if(['photo-resizer','passport-photo','photo-compressor','signature-resizer','thumb-impression-resizer','declaration-optimizer'].includes(id))return {data:await resized(files[0],o,id==='photo-compressor'?.75:.95),ext:'.jpg',mime:'image/jpeg'};
  if(id==='photo-signature-prep') {
   if(files.length!==2)throw Error('Choose the photo first and signature second.');
   const z=new JSZip();z.file('photo.jpg',await resized(files[0],{...o,width:o.photoWidth,height:o.photoHeight,targetKB:o.photoKB,minKB:'',imageCrop:o.photoCrop}));z.file('signature.jpg',await resized(files[1],{...o,imageCrop:o.signatureCrop}));
@@ -107,7 +126,7 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
  } else if(['jpg-to-pdf','png-to-pdf','image-to-pdf','scan-to-pdf'].includes(id)) {
   for(let i=0;i<files.length;i++) {
    if(files[i].mimeType==='application/pdf'){const src=await PDFDocument.load(bytes(files[i].base64));for(const p of await output.copyPages(src,src.getPageIndices()))output.addPage(p);}
-   else {const f=files[i];let img;if(id==='scan-to-pdf'&&o.scanQuality!=='high'){const source=await image(f),max=o.scanQuality==='small'?1600:2400,scale=Math.min(1,max/Math.max(source.width,source.height));const c=canvas(Math.max(1,Math.round(source.width*scale)),Math.max(1,Math.round(source.height*scale))),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(source,0,0,c.width,c.height);img=await output.embedJpg(bytes(c.toDataURL('image/jpeg',o.scanQuality==='small'?.68:.84).split(',')[1]));cleanCanvas(c);}else img=f.mimeType==='image/png'?await output.embedPng(bytes(f.base64)):await output.embedJpg(bytes(f.base64));const layout=id==='scan-to-pdf'?scanLayout(o.scanPaper,img.width,img.height):{width:595.28,height:841.89,margin:24};const page=output.addPage([layout.width,layout.height]);const dim=img.scaleToFit(layout.width-2*layout.margin,layout.height-2*layout.margin);page.drawImage(img,{x:(page.getWidth()-dim.width)/2,y:(page.getHeight()-dim.height)/2,...dim});}
+   else {const f=files[i];let img;if(id==='scan-to-pdf'&&o.scanQuality!=='high'){const source=await image(f),max=o.scanQuality==='small'?1600:2400,scale=Math.min(1,max/Math.max(source.width,source.height));const c=canvas(Math.max(1,Math.round(source.width*scale)),Math.max(1,Math.round(source.height*scale))),ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(source,0,0,c.width,c.height);img=await output.embedJpg(bytes(c.toDataURL('image/jpeg',o.scanQuality==='small'?.68:.84).split(',')[1]));cleanCanvas(c);}else img=f.mimeType==='image/png'?await output.embedPng(bytes(f.base64)):await output.embedJpg(bytes(f.base64));const layout=id==='scan-to-pdf'?scanLayout(o.scanPaper,img.width,img.height,o.scanMargin):{width:595.28,height:841.89,margin:24};const page=output.addPage([layout.width,layout.height]);const dim=img.scaleToFit(layout.width-2*layout.margin,layout.height-2*layout.margin);page.drawImage(img,{x:(page.getWidth()-dim.width)/2,y:(page.getHeight()-dim.height)/2,...dim});}
    progress((i+1)/files.length);
   }
  } else {

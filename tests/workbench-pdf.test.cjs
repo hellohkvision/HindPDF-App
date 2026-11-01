@@ -8,3 +8,20 @@ test('editor inserts and duplicates selected pages and writes area marks',async(
 test('PDF text chooses Unicode fonts and embeds a supplied custom font',async()=>{const {processDocument}=loadEngine(),a=await input(1);window.hindFonts=Object.fromEntries(['NotoSans','NotoSansDevanagari','NotoSansOriya','NotoSansBengali','NotoSansArabic','NotoSansTamil','NotoSansTelugu'].map(n=>[n,fs.readFileSync('src/engine/fonts/'+n+'-Regular.ttf').toString('base64')]));for(const text of ['Hello नमस्ते ନମସ୍କାର','বাংলা தமிழ் తెలుగు','العربية']){const out=await processDocument({id:'add-text'},[a],{...options,text,fontFamily:'auto',textColor:'blue'});assert.equal((await PDFDocument.load(out.data)).getPageCount(),1);}const out=await processDocument({id:'add-text'},[a],{...options,text:'नमस्ते',fontFamily:'custom',fontFile:{base64:window.hindFonts.NotoSansDevanagari}});assert.ok(out.data.length>1000);await assert.rejects(processDocument({id:'add-text'},[a],{...options,text:'😀',fontFamily:'auto'}),/supports/);});
 test('editor embeds an image on the selected page and rejects invalid placement',async()=>{const {processDocument}=loadEngine(),a=await input(2),imageFile={mimeType:'image/png',base64:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/a0YAAAAASUVORK5CYII='};const o={...options,pages:'2',width:'100',height:'',imageFile};const out=await processDocument({id:'add-image'},[a],o),pdf=await PDFDocument.load(out.data);assert.equal(pdf.getPageCount(),2);assert.ok(pdf.getPage(1).node.Contents());assert.ok(pdf.getPage(1).node.Resources().lookup(require('pdf-lib').PDFName.of('XObject')));await assert.rejects(processDocument({id:'add-image'},[a],{...o,x:'390'}),/image must fit/);await assert.rejects(processDocument({id:'add-image'},[a],{...o,imageFile:undefined}),/Choose a JPG/);});
 test('viewer extracts selectable text for only the requested page',async()=>{const {processDocument}=loadEngine(),doc=await PDFDocument.create(),font=await doc.embedFont(require('pdf-lib').StandardFonts.Helvetica);doc.addPage([400,600]).drawText('First page only',{x:20,y:500,font});doc.addPage([400,600]).drawText('Second page only',{x:20,y:500,font});const file={base64:Buffer.from(await doc.save()).toString('base64'),mimeType:'application/pdf'};const result=await processDocument({id:'pdf-extract-text'},[file],{...options,pages:'2'});assert.match(Buffer.from(result.data).toString('utf8'),/Second page only/);assert.doesNotMatch(Buffer.from(result.data).toString('utf8'),/First page only/);await assert.rejects(processDocument({id:'pdf-extract-text'},[file],{...options,pages:'3'}),/valid PDF page/);});
+test('scanned images fit the page without a default margin and respect an optional margin',async()=>{
+ const {processDocument}=loadEngine();
+ const file={base64:fs.readFileSync('assets/hindpdf-logo.png').toString('base64'),mimeType:'image/png'};
+ const placement=async(id,scanMargin)=>{
+  const out=await processDocument({id},[file],{scanPaper:'a4',scanQuality:'high',scanMargin});
+  const pdf=await PDFDocument.load(out.data),page=pdf.getPage(0),contents=page.node.Contents();
+  const stream=pdf.context.lookup(contents.get(0));
+  const commands=Buffer.from(require('pdf-lib').decodePDFRawStream(stream).decode()).toString();
+  const position=commands.match(/^1 0 0 1 ([\d.]+) ([\d.]+) cm$/m),size=[...commands.matchAll(/^([\d.]+) 0 0 ([\d.]+) 0 0 cm$/gm)].find(match=>Number(match[1])>1&&Number(match[2])>1);
+  assert.ok(position&&size,'PDF must place the scan image on the page');
+  return {page:page.getSize(),x:Number(position[1]),y:Number(position[2]),width:Number(size[1]),height:Number(size[2])};
+ };
+ const none=await placement('scan-to-pdf','0'),small=await placement('scan-to-pdf','small'),other=await placement('image-to-pdf','0');
+ assert.equal(none.x,0);assert.equal(none.width,none.page.width);assert.equal(none.width,none.height);
+ assert.equal(small.x,12);assert.equal(small.width,small.page.width-24);assert.equal(small.width,small.height);
+ assert.equal(other.x,24);assert.ok(none.y>0,'a square image remains uncropped on A4');
+});

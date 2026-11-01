@@ -6,25 +6,38 @@ function needsSpace(previous,current){
  const angle=Math.atan2(p[1],p[0]),cos=Math.cos(angle),sin=Math.sin(angle),dx=q[4]-p[4],dy=q[5]-p[5],along=dx*cos+dy*sin-previous.width,across=Math.abs(-dx*sin+dy*cos),height=Math.max(1,Number(previous.height)||Math.hypot(p[2],p[3])||1);
  return across>height*.55||along>height*.2;
 }
-function normalizeText(items){
- let text='',previous=null;const locations=[];
- const space=()=>{if(text&&!text.endsWith(' ')){text+=' ';locations.push(null);}};
+// Visit normalized text twice: build a searchable string, then map only the
+// actual matches back to PDF text items. This avoids allocating an object for
+// every character of every page in a large document.
+function visitText(items,emit){
+ let previous=null,hasText=false,lastSpace=false;
+ const space=()=>{if(hasText&&!lastSpace){emit(' ',-1,0,0);lastSpace=true;}};
  for(let itemIndex=0;itemIndex<items.length;itemIndex++){
   const item=items[itemIndex],value=typeof item.str==='string'?item.str:'';if(!value)continue;if(needsSpace(previous,item))space();
-  for(let offset=0;offset<value.length;){const cp=value.codePointAt(offset),character=String.fromCodePoint(cp),end=offset+character.length;if(/\s/u.test(character))space();else for(const folded of character.toLowerCase()){text+=folded;for(let j=0;j<folded.length;j++)locations.push({itemIndex,start:offset,end});}offset=end;}
+  for(let offset=0;offset<value.length;){const cp=value.codePointAt(offset),character=String.fromCodePoint(cp),end=offset+character.length;if(/\s/u.test(character))space();else {emit(character.toLowerCase(),itemIndex,offset,end);hasText=true;lastSpace=false;}offset=end;}
   previous=item;
  }
- return {text,locations};
 }
 function searchMatches(items,query,limit=Infinity){
- const needle=query.trim().replace(/\s+/g,' ').toLowerCase();if(!needle)return {matches:[],total:0};
- const {text,locations}=normalizeText(items),matches=[];let from=0,index,total=0;
+ const needle=query.trim().replace(/\s+/g,' ').toLowerCase();if(!needle||!(/[^\s\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/u.test(needle)))return {matches:[],total:0};
+ let text='';visitText(items,value=>{text+=value;});
+ const ranges=[];let from=0,index,total=0;
  while((index=text.indexOf(needle,from))!==-1){
-  total++;
-  if(matches.length<limit){const segments=[];for(let i=index;i<index+needle.length;i++){const pos=locations[i];if(!pos)continue;const last=segments[segments.length-1];if(last&&last.itemIndex===pos.itemIndex&&last.end>=pos.start)last.end=Math.max(last.end,pos.end);else segments.push({itemIndex:pos.itemIndex,start:pos.start,end:pos.end});}if(segments.length)matches.push(segments);}
+  total++;if(ranges.length<limit)ranges.push({start:index,end:index+needle.length,segments:[]});
   from=index+Math.max(needle.length,1);
  }
- return {matches,total};
+ if(!ranges.length)return {matches:[],total};
+ let position=0,rangeIndex=0;
+ visitText(items,(value,itemIndex,start,end)=>{
+  const next=position+value.length;
+  while(rangeIndex<ranges.length&&ranges[rangeIndex].end<=position)rangeIndex++;
+  if(itemIndex>=0)for(let i=rangeIndex;i<ranges.length&&ranges[i].start<next;i++){
+   const range=ranges[i];if(range.end<=position)continue;const segments=range.segments,last=segments[segments.length-1];
+   if(last&&last.itemIndex===itemIndex&&last.end>=start)last.end=Math.max(last.end,end);else segments.push({itemIndex,start,end});
+  }
+  position=next;
+ });
+ return {matches:ranges.map(range=>range.segments).filter(segments=>segments.length),total};
 }
 function findMatches(items,query){return searchMatches(items,query).matches;}
 function matchesPage(items,query){return findMatches(items,query).length>0;}

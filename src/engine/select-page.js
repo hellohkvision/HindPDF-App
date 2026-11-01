@@ -1,5 +1,6 @@
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.js';
 import * as pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
+import {useRenderedFonts} from './pdf-text-fonts.cjs';
 window.pdfjsWorker=pdfWorker;
 let doc=null,renderTask=null,textTask=null,pageRef=null;
 const send=(type,extra={})=>window.ReactNativeWebView?.postMessage(JSON.stringify({type,...extra}));
@@ -11,7 +12,7 @@ window.showPdfSelectionPage=async number=>{
   const container=document.getElementById('page');container.replaceChildren();container.style.width=viewport.width+'px';container.style.height=viewport.height+'px';container.style.setProperty('--scale-factor',String(scale));
   const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width*density);canvas.height=Math.ceil(viewport.height*density);canvas.style.width=viewport.width+'px';canvas.style.height=viewport.height+'px';container.appendChild(canvas);
   renderTask=page.render({canvasContext:canvas.getContext('2d'),viewport,transform:[density,0,0,density,0,0],background:'white'});await renderTask.promise;renderTask=null;
-  const content=await page.getTextContent(),layer=document.createElement('div');layer.className='textLayer';container.appendChild(layer);textTask=pdfjs.renderTextLayer({textContentSource:content,container:layer,viewport,textDivs:[]});await textTask.promise;textTask=null;
+  const content=await page.getTextContent(),layer=document.createElement('div');layer.className='textLayer';container.appendChild(layer);textTask=pdfjs.renderTextLayer({textContentSource:useRenderedFonts(content,document.fonts),container:layer,viewport,textDivs:[]});await textTask.promise;textTask=null;
   const hasText=content.items.some(item=>item.str&&item.str.trim());send('rendered',{page:number,hasText});window.scrollTo(0,0);
  }catch(error){if(error?.name!=='RenderingCancelledException')send('error',{message:'Could not render selectable text on this page.'});}
 };

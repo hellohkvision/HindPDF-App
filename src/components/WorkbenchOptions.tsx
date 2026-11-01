@@ -7,7 +7,7 @@ import {SignaturePad} from './SignaturePad';
 import {Button,Field,PasswordField,colors,s} from './ui';
 import type {ToolOptions} from '../types';
 const pageTools=new Set(['split','extract-pages','delete-pages','reorder-pages','rotate','crop-pdf','add-text','add-image','add-watermark','page-numbers','sign','pdf-to-image','unlock','highlight-area','outline-area','insert-blank','duplicate-pages']);
-const imageTools=new Set(['photo-resizer','passport-photo','photo-signature-prep']);
+const imageTools=new Set(['photo-resizer','photo-compressor','passport-photo','photo-signature-prep']);
 const optionalPages=(id:string)=>pageTools.has(id)&&!['delete-pages','reorder-pages','insert-blank','duplicate-pages'].includes(id);
 export function WorkbenchOptions({id,options,onUpdate,onUnit,onSignature,onFont,onImage,error,onClearError}:{id:string;options:ToolOptions;onUpdate:(key:keyof ToolOptions,value:any)=>void;onUnit:(unit:string)=>void;onSignature:()=>void;onFont?:()=>void;onImage?:()=>void;error:string;onClearError:()=>void}){
  const [advanced,setAdvanced]=useState(false),[signatureMode,setSignatureMode]=useState<'draw'|'type'|'image'>('draw');
@@ -15,7 +15,7 @@ export function WorkbenchOptions({id,options,onUpdate,onUnit,onSignature,onFont,
  const field=(key:keyof ToolOptions,label:string,props:Partial<TextInputProps>={})=><Field label={label} value={String(options[key]??'')} onChangeText={v=>set(key,v)} {...props}/>;
  const select=(label:string,key:keyof ToolOptions,choices:{id:string;name:string}[])=><View style={{gap:8}}><Text style={s.label}>{label}</Text><View style={{flexDirection:'row',flexWrap:'wrap',gap:8}}>{choices.map(choice=><Pressable key={choice.id} accessibilityRole="button" accessibilityState={{selected:options[key]===choice.id}} onPress={()=>set(key,choice.id)} style={{minHeight:44,paddingHorizontal:13,paddingVertical:9,borderRadius:12,justifyContent:'center',backgroundColor:options[key]===choice.id?'#fff0f2':'#f4f6f8',borderWidth:1,borderColor:options[key]===choice.id?colors.primary:colors.line}}><Text style={{fontSize:12,fontWeight:'600',color:options[key]===choice.id?colors.primary:colors.ink}}>{choice.name}</Text></Pressable>)}</View></View>;
  const pair=(a:keyof ToolOptions,b:keyof ToolOptions,first:string,second:string)=><View style={{flexDirection:'row',gap:10}}><View style={{flex:1}}>{field(a,first,{keyboardType:'decimal-pad'})}</View><View style={{flex:1}}>{field(b,second,{keyboardType:'decimal-pad'})}</View></View>;
- const requiredPages=['delete-pages','reorder-pages','insert-blank','duplicate-pages'].includes(id),hasAdvanced=optionalPages(id)||['add-text','add-watermark','page-numbers','sign','crop-pdf','photo-resizer','passport-photo','photo-signature-prep','compress'].includes(id);
+ const requiredPages=['delete-pages','reorder-pages','insert-blank','duplicate-pages'].includes(id),hasAdvanced=optionalPages(id)||['add-text','add-watermark','page-numbers','sign','crop-pdf','photo-resizer','photo-compressor','passport-photo','photo-signature-prep','compress'].includes(id);
  const hasSettings=pageTools.has(id)||imageTools.has(id)||['compress','ocr','excel-to-pdf','pdf-to-excel'].includes(id);
  if(!hasSettings)return error?<Text accessibilityRole="alert" style={s.error}>{error}</Text>:null;
  const switchSignature=(mode:'draw'|'type'|'image')=>{if(mode===signatureMode)return;setSignatureMode(mode);set('signaturePaths',[]);set('signature',undefined);set('text','');};

@@ -7,7 +7,7 @@ import {Text} from './AppText';
 import {colors} from './ui';
 import {useTheme} from '../theme/Theme';
 import {themedStyle} from '../theme/colors.cjs';
-import {save,share,openPdfWith} from '../services/storage';
+import {saveResult,share,openPdfWith} from '../services/storage';
 import {SelectablePdfPage} from './SelectablePdfPage';
 import {PdfSearchOverlay} from './PdfSearchOverlay';
 import type {OutputFile} from '../types';
@@ -29,7 +29,7 @@ export function PdfViewer({file,onBack,onEdit,onExtract,onSearchVisibility}:Prop
  const startText=useCallback((atPage:number)=>{if(pageCount<1)return;setMenu(false);setTextOnly(false);setTextPage(atPage||pageRef.current);onSearchVisibility(false);setTextOpen(true);},[pageCount,onSearchVisibility]);
  useEffect(()=>{if(!menu&&!searchOpen&&!textOpen)return;const sub=BackHandler.addEventListener('hardwareBackPress',()=>{if(textOpen){closeText();return true;}if(searchOpen){closeSearch();return true;}if(menu){setMenu(false);return true;}return false;});return()=>sub.remove();},[menu,searchOpen,textOpen,textPage,onSearchVisibility]);
  const icon=(name:React.ComponentProps<typeof Ionicons>['name'],label:string,action:()=>void,disabled=false)=><Pressable accessibilityRole="button" accessibilityLabel={label} disabled={disabled} onPress={action} style={[styles.icon,disabled&&{opacity:.35}]}><Ionicons name={name} size={23} color={colors.ink}/></Pressable>;
- const action=async(name:string)=>{setMenu(false);setMessage('');try{if(name==='Print')await Print.printAsync({uri:file.uri});else if(name==='Send file')await share(file);else if(name==='Download'){const done=await save(file);if(done)setMessage(Platform.OS==='android'?'File saved to the folder you selected.':'Choose where to save the file.');}else await openPdfWith(file);}catch{setMessage(name==='Open with'?'No app could open this PDF.':`Could not ${name.toLowerCase()} this file.`);}};
+ const action=async(name:string)=>{setMenu(false);setMessage('');try{if(name==='Print')await Print.printAsync({uri:file.uri});else if(name==='Send file')await share(file);else if(name==='Download'){const result=await saveResult(file);if(result.saved)setMessage(Platform.OS==='android'?`Saved to ${result.relativePath||'your selected folder'}.${result.folderRemembered===false?' The folder could not be remembered; please select it again next time.':''}`:'Choose where to save the file.');}else await openPdfWith(file);}catch{setMessage(name==='Open with'?'No app could open this PDF.':`Could not ${name.toLowerCase()} this file.`);}};
  return <View style={styles.root}><View style={styles.header}>{icon('arrow-back','Back',onBack)}<Text numberOfLines={1} style={styles.title}>{file.name}</Text>{icon('create-outline','Edit PDF',onEdit)}{icon('search','Search PDF',()=>{setMenu(false);searchPage.current=pageRef.current;setSearchOpen(true);})}{icon('ellipsis-vertical','More options',()=>setMenu(!menu))}</View>
  <View style={styles.document}><PdfSurface key={file.uri} pdfRef={pdf} uri={file.uri} scale={scale} onZoom={onZoom} onLoaded={onLoaded} onPage={onPage} onError={onPdfError} onLongPress={startText}/>{pageCount>0&&<View style={styles.pageBadge}><Text style={styles.pageText}>{page} / {pageCount}</Text></View>}<View style={styles.zoom}>{icon('remove','Zoom out',()=>changeZoom(-1),scale<=1)}{icon('add','Zoom in',()=>changeZoom(1),scale>=4)}</View></View>
  {!!message&&<Text accessibilityRole="alert" style={styles.message}>{message}</Text>}

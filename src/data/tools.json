@@ -144,6 +144,31 @@
     ]
   },
   {
+    "id": "photo-compressor",
+    "slug": "photo-compressor",
+    "catKey": "core",
+    "persona": [
+      "students"
+    ],
+    "name": "Compress Image",
+    "tier": "free",
+    "desc": "Compress a JPG or PNG image to a smaller JPEG file.",
+    "color": "#ea580c",
+    "prefix": "Compressed_image_",
+    "ext": ".jpg",
+    "mime": "image/jpeg",
+    "cat": "image",
+    "accept": "image/jpeg,image/png,.jpg,.jpeg,.png",
+    "multiple": false,
+    "location": "device",
+    "available": true,
+    "keywords": [
+      "compress image",
+      "image compressor",
+      "reduce image size"
+    ]
+  },
+  {
     "id": "photo-signature-prep",
     "slug": "photo-signature-prep",
     "catKey": "core",
