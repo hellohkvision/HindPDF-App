@@ -1,6 +1,6 @@
 {
   "name": "hindpdf-mobile",
-  "version": "1.0.59",
+  "version": "1.0.60",
   "private": true,
   "main": "index.ts",
   "scripts": {
