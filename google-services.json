@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "191538884503",
+    "project_id": "hindpdf-a7965",
+    "storage_bucket": "hindpdf-a7965.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:191538884503:android:75c8e15c402d05d6979ed2",
+        "android_client_info": {
+          "package_name": "com.hindpdf.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "191538884503-9v05spm8i8ofjrp6tvj8iupn4quiqghn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hindpdf.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "191538884503-kh40dmge1h4bldt4bf5fobv1jcfgaknt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-nxv6Nx4mYFmvfK1J2SkUjP_AF3D1AfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "191538884503-kh40dmge1h4bldt4bf5fobv1jcfgaknt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

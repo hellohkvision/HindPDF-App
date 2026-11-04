@@ -35,6 +35,8 @@ To refresh the copied website tool catalog and government guidance, place a chec
 
 ## Google sign-in setup
 
+The Android build uses the supplied `google-services.json`, Google Services Gradle plugin 4.5.0, and Firebase BoM 35.1.0 with Firebase Analytics. Analytics is separate from Google authentication.
+
 1. In Firebase Authentication for project `hindpdf-a7965`, enable the Google sign-in provider. Confirm that the web OAuth client used below belongs to that project.
 2. Register Android package `com.hindpdf.app` in that Firebase/Google Cloud project and add the SHA-1 signing certificate for **each** build that will be used (local debug, CI/preview, and Play App Signing/release as applicable). Create or confirm the Android OAuth client for each package and certificate. The local debug SHA-1 can be obtained with `keytool -list -v -alias androiddebugkey -keystore android/app/debug.keystore -storepass android -keypass android`. Use the real release/Play certificate for published builds; it is usually different.
 3. The app defaults to the public HindPDF website web OAuth client ID `191538884503-kh40dmge1h4bldt4bf5fobv1jcfgaknt.apps.googleusercontent.com`. If Firebase uses a different web OAuth client, set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` when building. Client IDs are public identifiers; never put a client secret in the app.
