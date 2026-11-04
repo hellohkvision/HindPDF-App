@@ -2,7 +2,7 @@ import {Pressable,ScrollView,View,Ionicons,SafeAreaView} from './src/theme/Theme
 import {useFonts,Montserrat_400Regular,Montserrat_500Medium,Montserrat_600SemiBold,Montserrat_700Bold,Montserrat_800ExtraBold,Montserrat_900Black} from '@expo-google-fonts/montserrat';
 import {Text} from './src/components/AppText';
 import React,{useEffect,useRef,useState} from 'react';
-import {ActivityIndicator, Alert, BackHandler, Image, Linking, Platform} from 'react-native';
+import {ActivityIndicator, Alert, BackHandler, Image, Linking, Platform, Text as NativeText} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {StatusBar} from 'expo-status-bar';
@@ -133,4 +133,10 @@ function AppBody(){
  {screen==='presets'&&<><Text style={s.title}>Application guidance</Text><Text style={s.body}>Use the current recruitment notice and portal for final requirements.</Text>{presets.map((p:any)=><Card key={p.id}><Pressable onPress={()=>setPreset(preset?.id===p.id?null:p)}><Text style={s.h2}>{p.name} {preset?.id===p.id?'−':'+'}</Text></Pressable>{preset?.id===p.id&&<><Text style={s.body}>{p.disclaimer}</Text>{p.sourceUrl&&<Button title="View official source" secondary onPress={()=>Linking.openURL(p.sourceUrl).catch(e=>setError(friendlyError(e)))}/>}</>}</Card>)}</>}
  </ScrollView>{screen==='tool'&&tool&&tool.available&&!['protect-password','html-to-pdf','repair-pdf'].includes(tool.id)&&<View style={{paddingHorizontal:20,paddingTop:8,paddingBottom:10,backgroundColor:'white',borderTopWidth:1,borderColor:colors.line,gap:6}}>{busy&&<Text accessibilityLiveRegion="polite" style={s.small}>{progress>0?`Processing… ${progress}%`:'Processing your file…'}</Text>}<Button title={files.length?(actionLabels[tool.id]||'Process file'):(tool.multiple?'Choose files':'Choose file')} onPress={files.length?execute:choose} busy={busy}/></View>}<AppNavigation active={activeTab} onSelect={selectTab}/></SafeAreaView>;
 }
-export default function App(){const [loaded,error]=useFonts({Montserrat_400Regular,Montserrat_500Medium,Montserrat_600SemiBold,Montserrat_700Bold,Montserrat_800ExtraBold,Montserrat_900Black});const splashHidden=useRef(false);if(!loaded&&!error)return null;return <ThemeProvider><SafeAreaProvider><View style={{flex:1}} onLayout={()=>{if(!splashHidden.current){splashHidden.current=true;void SplashScreen.hideAsync().catch(()=>{});}}}><AppBody/></View></SafeAreaProvider></ThemeProvider>;}
+export default function App(){
+ const [loaded,error]=useFonts({Montserrat_400Regular,Montserrat_500Medium,Montserrat_600SemiBold,Montserrat_700Bold,Montserrat_800ExtraBold,Montserrat_900Black});
+ const [minimumElapsed,setMinimumElapsed]=useState(false);const splashHidden=useRef(false);
+ useEffect(()=>{const timer=setTimeout(()=>setMinimumElapsed(true),900);return()=>clearTimeout(timer);},[]);
+ const starting=(!loaded&&!error)||!minimumElapsed;
+ return <ThemeProvider><SafeAreaProvider><View style={{flex:1}} onLayout={()=>{if(!splashHidden.current){splashHidden.current=true;void SplashScreen.hideAsync().catch(()=>{});}}}>{starting?<View style={{flex:1,backgroundColor:'#fefefe',alignItems:'center',justifyContent:'center'}}><StatusBar style="dark"/><Image source={require('./assets/hindpdf-mark.png')} resizeMode="contain" accessible accessibilityLabel="HindPDF" style={{width:120,height:120}}/><View style={{position:'absolute',bottom:55,alignItems:'center',gap:18}}><ActivityIndicator color="#e91d48" size="small"/><NativeText style={{fontSize:18,fontWeight:'900',color:'#0b1220'}}>Hind<NativeText style={{color:'#e91d48'}}>PDF</NativeText></NativeText><NativeText style={{fontSize:13,color:'#0b1220'}}>Made with ❤️ Odisha</NativeText></View></View>:<AppBody/>}</View></SafeAreaProvider></ThemeProvider>;
+}
