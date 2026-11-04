@@ -9,6 +9,10 @@ const managerPath=path.join(root,'android/src/main/java/org/wonday/pdf/PdfManage
 const fabricPath=path.join(root,'fabric/RNPDFPdfNativeComponent.js'), indexPath=path.join(root,'index.js'), iosPath=path.join(root,'ios/RNPDFPdf/RNPDFPdfView.mm');
 let view=fs.readFileSync(viewPath,'utf8'),manager=fs.readFileSync(managerPath,'utf8'),fabric=fs.readFileSync(fabricPath,'utf8'),index=fs.readFileSync(indexPath,'utf8'),ios=fs.readFileSync(iosPath,'utf8');
 function replace(source,oldText,newText,name){if(source.includes(newText))return source;if(!source.includes(oldText))throw Error('Cannot apply PDF patch: '+name);return source.replace(oldText,newText);}
+view=view.replace('            // Prefetch nearby page tiles before they enter the viewport.\n            Constants.PRELOAD_OFFSET = 240;\n','');
+view=replace(view,'public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompleteListener,OnErrorListener,OnTapListener,OnDrawListener,OnPageScrollListener, LinkHandler {',`public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompleteListener,OnErrorListener,OnTapListener,OnDrawListener,OnPageScrollListener, LinkHandler {
+    // PagesLoader reads this value in the superclass constructor.
+    static { Constants.PRELOAD_OFFSET = 240; }`,'nearby page prefetch');
 view=replace(view,'import android.graphics.Canvas;','import android.graphics.Canvas;\nimport android.graphics.PointF;','PointF');
 view=replace(view,'    private float lastPageHeight = 0;',`    private float lastPageHeight = 0;
     private String lastDocumentConfig = null;

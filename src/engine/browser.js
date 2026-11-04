@@ -15,6 +15,7 @@ import {scanLayout} from './scan-layout.cjs';
 import {detectPage} from './scan-detect.cjs';
 import {projectiveCoefficients} from './perspective.cjs';
 import {searchAndHighlight} from './pdf-highlights.cjs';
+import {listPdfTextFields,updatePdfTextField} from './pdf-form-fields.cjs';
 window.pdfjsWorker=pdfWorker;
 const send=data=>window.ReactNativeWebView.postMessage(JSON.stringify(data));
 const bytes=b64=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -27,7 +28,19 @@ function textPainter(doc,options){
  doc.registerFontkit(fontkit);const fonts=new Map(),parsed=new Map();
  const dataFor=name=>name==='custom'?options.fontFile?.base64:window.hindFonts?.[name];
  const get=async name=>{if(fonts.has(name))return fonts.get(name);const data=dataFor(name);if(!data)throw Error('Choose a font that supports this text.');let raw,face;try{raw=bytes(data);face=fontkit.create(raw);}catch{throw Error('Choose a valid TTF or OTF font.');}parsed.set(name,face);const font=await doc.embedFont(raw,{subset:false});fonts.set(name,font);return font;};
- return async(page,text,x,top,size,color)=>{let y=page.getHeight()-top-size;const start=x;for(const line of text.split(/\r?\n/)){if(y<0)throw Error('Text position must fit inside the page.');x=start;let runs=[];for(const ch of line){const cp=ch.codePointAt(0),name=options.fontFamily==='custom'?'custom':(cp===0x200c||cp===0x200d)&&runs.length?runs[runs.length-1].name:scriptFont(cp);const font=await get(name);if(!parsed.get(name).hasGlyphForCodePoint(cp))throw Error('Choose a font that supports all entered characters.');const last=runs[runs.length-1];if(last&&last.name===name)last.text+=ch;else runs.push({name,font,text:ch});}for(const run of runs){const advance=run.font.widthOfTextAtSize(run.text,size);if(x+advance>page.getWidth())throw Error('Text position must fit inside the page.');page.drawText(run.text,{x,y,size,font:run.font,color});x+=advance;}y-=size*1.25;}};
+ return async(page,text,x,top,size,color)=>{
+  const available=page.getWidth()-x,boxWidth=options.width?positive(options.width,available):available;
+  if(boxWidth>available)throw Error('Text box must fit inside the page.');
+  const boxHeight=options.height?positive(options.height,page.getHeight()-top):page.getHeight()-top;
+  if(boxHeight>page.getHeight()-top)throw Error('Text box must fit inside the page.');
+  const lineHeight=size*1.25;let row=0;
+  const shape=async value=>{const runs=[];for(const ch of value){const cp=ch.codePointAt(0),name=options.fontFamily==='custom'?'custom':(cp===0x200c||cp===0x200d)&&runs.length?runs[runs.length-1].name:scriptFont(cp);const font=await get(name);if(!parsed.get(name).hasGlyphForCodePoint(cp))throw Error('Choose a font that supports all entered characters.');const last=runs[runs.length-1];if(last&&last.name===name)last.text+=ch;else runs.push({name,font,text:ch});}let total=0;for(const run of runs)total+=run.font.widthOfTextAtSize(run.text,size);return {runs,total};};
+  const draw=async value=>{if(row*lineHeight+size>boxHeight)throw Error('Text box is too small for this text.');let left=x;const {runs}=await shape(value);for(const run of runs){page.drawText(run.text,{x:left,y:page.getHeight()-top-size-row*lineHeight,size,font:run.font,color});left+=run.font.widthOfTextAtSize(run.text,size);}row++;};
+  for(const paragraph of text.split(/\r?\n/)){
+   let line='';for(const word of paragraph.split(/(\s+)/u)){if(!word)continue;const candidate=line+word;if((await shape(candidate)).total<=boxWidth){line=candidate;continue;}if(line.trim()){await draw(line.trimEnd());line='';}if(/^\s+$/u.test(word))continue;if((await shape(word)).total<=boxWidth){line=word;continue;}const chars=typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(word)].map(part=>part.segment):Array.from(word);for(const ch of chars){if((await shape(line+ch)).total>boxWidth){if(!line)throw Error('Text box is too narrow for this text.');await draw(line);line=ch;if((await shape(line)).total>boxWidth)throw Error('Text box is too narrow for this text.');}else line+=ch;}}
+   await draw(line.trimEnd());
+  }
+ };
 }
 async function raster(file, o, progress, kind) {
  const source=await pdfjs.getDocument({data:bytes(file.base64),password:o.password||undefined,isEvalSupported:false,useSystemFonts:true}).promise;
@@ -56,7 +69,7 @@ async function resized(file,o,quality=.95) {
  const min=o.minKB?positive(o.minKB,0,100000)*1024:0;
  if(min>target)throw Error('Minimum size cannot exceed maximum size.');
  const dpi=Number(o.dpi);const resolution=Number.isFinite(dpi)&&dpi>=36&&dpi<=1200?dpi:300,encode=q=>jpegWithDensity(bytes(c.toDataURL('image/jpeg',q).split(',')[1]),resolution);
- let best=encode(quality);
+ let best=encode(min>0?.95:quality);
  if(best.length>target){let lo=.02,hi=.95;best=null;for(let i=0;i<12;i++){const q=(lo+hi)/2,b=encode(q);if(b.length<=target){best=b;lo=q;}else hi=q;}}
  cleanCanvas(c);
  if(!best)throw Error('Target size is too small for these dimensions. Reduce width and height.');
@@ -65,6 +78,8 @@ async function resized(file,o,quality=.95) {
 }
 export async function processDocument(tool,files,o,progress=()=>{}) {
  const id=tool.id;
+ if(id==='pdf-form-fields')return {data:new TextEncoder().encode(JSON.stringify(await listPdfTextFields(bytes(files[0].base64)))),ext:'.json',mime:'application/json'};
+ if(id==='pdf-form-set-text')return {data:await updatePdfTextField(bytes(files[0].base64),o.fieldName,o.text),ext:'.pdf',mime:'application/pdf'};
  if(id==='pdf-search')return searchAndHighlight(bytes(files[0].base64),o.text,{pdfjs,PDFDocument,rgb,degrees},progress);
  if(id==='pdf-extract-text'){
   const doc=await pdfjs.getDocument({data:bytes(files[0].base64),isEvalSupported:false,useSystemFonts:true}).promise;
@@ -116,10 +131,10 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
  if(['photo-resizer','passport-photo','photo-compressor','signature-resizer','thumb-impression-resizer','declaration-optimizer'].includes(id))return {data:await resized(files[0],o,id==='photo-compressor'?.75:.95),ext:'.jpg',mime:'image/jpeg'};
  if(id==='photo-signature-prep') {
   if(files.length!==2)throw Error('Choose the photo first and signature second.');
-  const z=new JSZip();z.file('photo.jpg',await resized(files[0],{...o,width:o.photoWidth,height:o.photoHeight,targetKB:o.photoKB,minKB:'',imageCrop:o.photoCrop}));z.file('signature.jpg',await resized(files[1],{...o,imageCrop:o.signatureCrop}));
+  const z=new JSZip();z.file('photo.jpg',await resized(files[0],{...o,width:o.photoWidth,height:o.photoHeight,targetKB:o.photoKB,minKB:o.photoMinKB||'',imageCrop:o.photoCrop}));z.file('signature.jpg',await resized(files[1],{...o,imageCrop:o.signatureCrop}));
   return {data:await z.generateAsync({type:'uint8array'}),ext:'.zip',mime:'application/zip'};
  }
- const output=await PDFDocument.create();
+ let output=await PDFDocument.create();
  if(id==='merge') {
   if(files.length<2)throw Error('Choose at least two PDF files.');
   for(let i=0;i<files.length;i++){const src=await PDFDocument.load(bytes(files[i].base64));const pages=await output.copyPages(src,src.getPageIndices());pages.forEach(p=>output.addPage(p));progress((i+1)/files.length);}
@@ -138,7 +153,7 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
   if(id==='delete-pages'&&!o.pages.trim())throw Error('Enter the page numbers to delete.');
   const keep=id==='delete-pages'?source.getPageIndices().filter(i=>!selected.includes(i)):['extract-pages','reorder-pages'].includes(id)?selected:id==='duplicate-pages'?source.getPageIndices().flatMap(i=>selected.includes(i)?[i,i]:[i]):source.getPageIndices();
   if(!keep.length)throw Error('Keep at least one page in the document.');
-  const pages=await output.copyPages(source,keep);pages.forEach(p=>output.addPage(p));
+  const pages=id==='add-text'?(output=source,source.getPages()):await output.copyPages(source,keep);if(id!=='add-text')pages.forEach(p=>output.addPage(p));
   if(id==='insert-blank'){for(const i of [...selected].sort((a,b)=>b-a)){const {width,height}=pages[i].getSize();output.insertPage(i+1,[width,height]);}}
   let imageToAdd;if(id==='add-image'){if(!o.imageFile?.base64)throw Error('Choose a JPG or PNG image to add.');imageToAdd=o.imageFile.mimeType==='image/png'?await output.embedPng(bytes(o.imageFile.base64)):await output.embedJpg(bytes(o.imageFile.base64));}
   let font;const paintText=id==='add-text'&&window.hindFonts?textPainter(output,o):null;
@@ -176,7 +191,7 @@ export async function processDocument(tool,files,o,progress=()=>{}) {
    progress((j+1)/pages.length);
   }
  }
- return {data:await output.save(),ext:'.pdf',mime:'application/pdf'};
+ return {data:await output.save(id==='add-text'?{updateFieldAppearances:false}:undefined),ext:'.pdf',mime:'application/pdf'};
 }
 let running=false;
 window.hindRun=async request=>{
