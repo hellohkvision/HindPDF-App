@@ -1,0 +1,3 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {mapLiveEdges}=require('../src/utils/live-edge-map.cjs');
+test('maps and clips frame edges to the camera preview',()=>{assert.deepEqual(mapLiveEdges({found:true,left:.25,top:.2,right:.75,bottom:.8,frameWidth:100,frameHeight:200},200,200),[50,0,150,200]);});
+test('mirrors the front camera and rejects uncertain or invalid edges',()=>{const e={found:true,left:.1,top:.2,right:.4,bottom:.8,frameWidth:100,frameHeight:100,mirrored:true};const r=mapLiveEdges(e,100,100);assert.ok(Math.abs(r[0]-60)<1e-8&&Math.abs(r[2]-90)<1e-8);assert.equal(mapLiveEdges({...e,found:false},100,100),null);assert.equal(mapLiveEdges({...e,left:2},100,100),null);});

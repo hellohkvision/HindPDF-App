@@ -44,3 +44,7 @@ The Android build uses the supplied `google-services.json`, Google Services Grad
 5. Generate a new native build after changing native modules or OAuth configuration. Test sign-in, cancellation, sign-out/account switching, and account deletion on actual devices, including the release-signed build. Google Play services are required on Android. Expo Go is not supported.
 
 No Google client secret is needed in the mobile app. Provider enablement and signing registrations are managed in the Firebase/Google Cloud consoles and cannot be verified from this repository.
+
+## Android live scan edges
+
+The Android development/release build uses a postinstall patch for Expo Camera frame analysis. It detects approximate rectangular edges offline and shows them as a live guide; the captured page is reviewed and cropped separately. The detector is conservative and may not follow skewed or low-contrast documents. iOS retains the fixed guide. A new native build and real-device tests are required after installing this integration.
