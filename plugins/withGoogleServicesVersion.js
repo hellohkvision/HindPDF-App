@@ -11,7 +11,12 @@ module.exports=function withGoogleServicesVersion(config){
  return withAppBuildGradle(config,mod=>{
   if(mod.modResults.language!=='groovy')throw Error('Firebase Analytics requires Groovy app build.gradle.');
   let text=mod.modResults.contents;
-  if(!text.includes('com.google.firebase:firebase-bom:35.1.0')){const marker=/dependencies\s*\{/;if(!marker.test(text))throw Error('App dependencies block not found.');text=text.replace(marker,m=>m+"\n    implementation platform('com.google.firebase:firebase-bom:35.1.0')\n    implementation 'com.google.firebase:firebase-analytics'");}
+  // BoM 35.x pulls in measurement 24.x, whose Kotlin 2.4 metadata is
+  // incompatible with the Kotlin compiler shipped with this Expo SDK.
+  const bom=/com\.google\.firebase:firebase-bom:[^"']+/;
+  if(bom.test(text)) text=text.replace(bom,'com.google.firebase:firebase-bom:34.8.0');
+  else {const marker=/dependencies\s*\{/;if(!marker.test(text))throw Error('App dependencies block not found.');text=text.replace(marker,m=>m+"\n    implementation platform('com.google.firebase:firebase-bom:34.8.0')");}
+  if(!text.includes('com.google.firebase:firebase-analytics')){const marker=/dependencies\s*\{/;if(!marker.test(text))throw Error('App dependencies block not found.');text=text.replace(marker,m=>m+"\n    implementation 'com.google.firebase:firebase-analytics'");}
   mod.modResults.contents=text;return mod;
  });
 };
