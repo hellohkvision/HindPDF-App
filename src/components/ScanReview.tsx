@@ -24,8 +24,14 @@ export function ScanReview({files,busy,error,onBack,onRemove,onMove,onUpdate,onC
  useEffect(()=>{let active=true;if(file)Image.getSize(file.uri,(width,height)=>{if(active)setSize({width,height});},()=>{if(active)setSize({width:0,height:0});});return()=>{active=false;};},[file?.uri]);
  const scale=size.width&&size.height?Math.min(box.width/size.width,box.height/size.height):0,w=size.width*scale,h=size.height*scale;
  const detect=async()=>{if(!file||locked)return;setWorking(true);try{const m=await onDetect(file);setPoints([{x:m.left/100,y:m.top/100},{x:1-m.right/100,y:m.top/100},{x:1-m.right/100,y:1-m.bottom/100},{x:m.left/100,y:1-m.bottom/100}]);onError('');}catch{setPoints(full());onError('Drag the corners to fit the document.');}finally{setWorking(false);}};
- useEffect(()=>{if((autoDetect||detectionRequest>0)&&file)void detect();},[index,detectionRequest]);
+ useEffect(()=>{if((autoDetect||detectionRequest>0)&&file&&!files.some(page=>page.autoCropPending))void detect();},[index,detectionRequest]);
  const saveEdit=(original:InputFile,result:InputFile)=>{undo.current[result.uri]=original;onUpdate(original.uri,result);onError('');};
+ useEffect(()=>{
+  const pending=files.filter(page=>page.autoCropPending);if(!pending.length)return;
+  let active=true;setWorking(true);
+  void (async()=>{let missed=0;for(const page of pending){if(!active)break;try{const m=await onDetect(page);const points=[{x:m.left/100,y:m.top/100},{x:1-m.right/100,y:m.top/100},{x:1-m.right/100,y:1-m.bottom/100},{x:m.left/100,y:1-m.bottom/100}];const cropped=await onCrop(page,points);if(active){undo.current[cropped.uri]={...page,autoCropPending:false};onUpdate(page.uri,{...cropped,autoCropPending:false});}}catch{if(active){missed++;onUpdate(page.uri,{...page,autoCropPending:false});}}}if(active){setWorking(false);setMode('edit');onError(missed?'Some page edges were unclear. Use Crop to adjust them.':'');}})();
+  return()=>{active=false;};
+ },[]);
  const crop=async()=>{if(!file||locked)return;setWorking(true);try{const result=await onCrop(file,points);saveEdit(file,result);setMode('edit');}catch{onError('Check the corners and try again.');}finally{setWorking(false);}};
  const rotate=async(degrees:number)=>{if(!file||locked)return;setWorking(true);try{const r=await ImageManipulator.manipulateAsync(file.uri,[{rotate:degrees}],{compress:.93,format:ImageManipulator.SaveFormat.JPEG});saveEdit(file,{...file,uri:r.uri,mimeType:'image/jpeg',size:0});if(mode==='crop')setPoints(full());}catch{onError('Could not rotate this page.');}finally{setWorking(false);}};
  const filter=async(id:string)=>{if(!file||locked)return;const source=filterSources.current[file.uri]||file;if(id==='original'){if(source.uri!==file.uri)onUpdate(file.uri,source);onError('');return;}if(filterModes.current[file.uri]===id)return;setWorking(true);try{const result=await onFilter(source,id);filterSources.current[result.uri]=source;filterModes.current[result.uri]=id;saveEdit(file,result);}catch{onError('Could not apply the filter.');}finally{setWorking(false);}};

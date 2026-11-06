@@ -1,5 +1,5 @@
 export type Tool = { id: string; name: string; desc: string; catKey: string; tier: string; color: string; accept: string; ext: string; mime: string; multiple: boolean; location: string; available: boolean; keywords?: string[] };
-export type InputFile = { uri: string; name: string; mimeType: string; size: number };
+export type InputFile = { uri: string; name: string; mimeType: string; size: number; autoCropPending?: boolean };
 export type ScanDraft = { id: string; name: string; pages: InputFile[]; updatedAt: string };
 export type PdfSearchHit = {page:number;x:number;y:number;pdfX:number;pdfY:number};
 export type PdfSearchResult = {uri:string;matches:PdfSearchHit[];total:number};

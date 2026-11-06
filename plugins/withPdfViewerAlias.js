@@ -8,7 +8,7 @@ module.exports=function withPdfViewerAlias(config){
   const main=AndroidConfig.Manifest.getMainActivityOrThrow(mod.modResults);
   const name='.PdfViewerActivity';
   app['activity-alias']=(app['activity-alias']||[]).filter(item=>![name,'.PdfEditorActivity'].includes(item.$['android:name']));
-  for(const entry of [{name,label:'HindPDF PDF Viewer',actions:['VIEW']},{name:'.PdfEditorActivity',label:'HindPDF PDF Editor',actions:['VIEW','EDIT']}])app['activity-alias'].push({
+  for(const entry of [{name,label:'PDF Viewer',actions:['VIEW']},{name:'.PdfEditorActivity',label:'PDF Edit',actions:['VIEW','EDIT']}])app['activity-alias'].push({
    $:{'android:name':entry.name,'android:targetActivity':main.$['android:name'],'android:exported':'true','android:label':entry.label},
    'intent-filter':[{action:entry.actions.map(action=>({$:{'android:name':`android.intent.action.${action}`}})),category:[{$:{'android:name':'android.intent.category.DEFAULT'}},{$:{'android:name':'android.intent.category.BROWSABLE'}}],data:[{$:{'android:scheme':'content','android:mimeType':'application/pdf'}},{$:{'android:scheme':'file','android:mimeType':'application/pdf'}}]}]
   });
